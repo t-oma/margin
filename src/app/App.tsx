@@ -1,14 +1,21 @@
 import * as stylex from "@stylexjs/stylex"
+import { Header } from "@/components/header"
+import { typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
-  header: {
-    backgroundColor: "#000",
-    color: "#fff",
+  root: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.fontSizeMd,
+    lineHeight: typography.lineHeightMd,
   },
 })
 
 function App() {
-  return <header {...stylex.props(styles.header)}>Home</header>
+  return (
+    <div {...stylex.props(styles.root)}>
+      <Header />
+    </div>
+  )
 }
 
 export default App
