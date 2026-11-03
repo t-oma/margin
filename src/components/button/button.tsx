@@ -1,3 +1,4 @@
+import { focusStyles } from "@/styles/focus"
 import {
   colors,
   media,
@@ -105,6 +106,7 @@ export function Button({
       {...props}
       {...stylex.props(
         styles.root,
+        focusStyles.ring,
         colorVariants[variant],
         sizeVariants[size],
         disabled && styles.disabled
