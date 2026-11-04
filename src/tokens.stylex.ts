@@ -21,6 +21,7 @@ export const colors = stylex.defineVars({
   // Borders
   border: "#DCDFE5",
   borderControl: "#8A91A0",
+  borderControlHover: "#454B57",
   borderRow: "#ECEEF1",
   borderDisabled: "#C9CED7",
   marginRule: "#B8C3EE",
