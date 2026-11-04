@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps, ReactNode } from "react"
+import type { ComponentPropsWithRef, ReactNode } from "react"
 
-import { focusStyles } from "@/styles/focus"
+import { focusRing } from "@/styles/focus"
 import {
   colors,
   media,
@@ -10,6 +10,8 @@ import {
   spacing,
   typography,
 } from "@/tokens.stylex"
+
+import type { WithoutStyleProps } from "../types"
 
 const styles = stylex.create({
   root: {
@@ -80,7 +82,7 @@ const sizeVariants = stylex.create({
   },
 })
 
-type ButtonProps = Omit<ComponentProps<"button">, "className" | "style"> & {
+type ButtonProps = WithoutStyleProps<ComponentPropsWithRef<"button">> & {
   /**
    * @default 'primary'
    */
@@ -107,7 +109,7 @@ export function Button({
       {...props}
       {...stylex.props(
         styles.root,
-        focusStyles.ring,
+        focusRing.base,
         colorVariants[variant],
         sizeVariants[size],
         disabled && styles.disabled
