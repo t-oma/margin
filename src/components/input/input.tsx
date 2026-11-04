@@ -45,7 +45,7 @@ const styles = stylex.create({
   },
 })
 
-type InputProps = WithoutStyleProps<ComponentPropsWithRef<"input">>
+export type InputProps = WithoutStyleProps<ComponentPropsWithRef<"input">>
 
 export function Input({
   disabled,
