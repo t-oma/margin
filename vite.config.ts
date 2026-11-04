@@ -1,12 +1,13 @@
 /// <reference types="vitest/config" />
-import react, { reactCompilerPreset } from "@vitejs/plugin-react"
-import babel from "@rolldown/plugin-babel"
-import { unplugin as stylex } from "@stylexjs/unplugin"
-import { defineConfig } from "vite"
-import { fileURLToPath } from "node:url"
 import path from "node:path"
+import { fileURLToPath } from "node:url"
+
+import babel from "@rolldown/plugin-babel"
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin"
+import { unplugin as stylex } from "@stylexjs/unplugin"
+import react, { reactCompilerPreset } from "@vitejs/plugin-react"
 import { playwright } from "@vitest/browser-playwright"
+import { defineConfig } from "vite"
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const rootDir = fileURLToPath(new URL(".", import.meta.url))

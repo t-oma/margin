@@ -1,5 +1,6 @@
-import { colors } from "@/tokens.stylex"
 import * as stylex from "@stylexjs/stylex"
+
+import { colors } from "@/tokens.stylex"
 
 const styles = stylex.create({
   base: {

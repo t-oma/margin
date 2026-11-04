@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex"
-import { Logo } from "./logo"
+
 import { spacing, typography } from "@/tokens.stylex"
+
+import { Logo } from "./logo"
 
 const BRAND_NAME = "Margin"
 

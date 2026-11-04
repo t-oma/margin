@@ -1,3 +1,6 @@
+import * as stylex from "@stylexjs/stylex"
+import type { ComponentProps, ReactNode } from "react"
+
 import { focusStyles } from "@/styles/focus"
 import {
   colors,
@@ -7,8 +10,6 @@ import {
   spacing,
   typography,
 } from "@/tokens.stylex"
-import * as stylex from "@stylexjs/stylex"
-import type { ComponentProps, ReactNode } from "react"
 
 const styles = stylex.create({
   root: {

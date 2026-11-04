@@ -1,5 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
+
 import { colors, spacing, zIndices } from "@/tokens.stylex"
+
 import { Brand } from "../brand"
 
 const styles = stylex.create({

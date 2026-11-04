@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
-import { Button } from "./button"
 import { PlusIcon } from "lucide-react"
+
+import { Button } from "./button"
 
 const styles = stylex.create({
   wrapper: {
