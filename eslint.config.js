@@ -32,6 +32,13 @@ export default defineConfig([
       "@stylexjs/valid-shorthands": "error",
       "@stylexjs/no-conflicting-props": "error",
       "@stylexjs/sort-keys": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
   ...storybook.configs["flat/recommended"],
