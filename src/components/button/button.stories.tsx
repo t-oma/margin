@@ -31,7 +31,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A native button with primary, secondary, and danger variants. Use Tab to check keyboard focus. Icon-only buttons need an accessible name through aria-label.",
+          "A native button with primary, secondary, danger and ghost variants. Use Tab to check keyboard focus. Icon-only buttons need an accessible name through aria-label.",
       },
     },
   },
@@ -107,6 +107,9 @@ export const Variants: Story = {
       <Button variant="danger" {...args}>
         {children}
       </Button>
+      <Button variant="ghost" {...args}>
+        {children}
+      </Button>
     </div>
   ),
 }
@@ -122,6 +125,12 @@ export const Secondary: Story = {
 export const Danger: Story = {
   args: {
     variant: "danger",
+  },
+}
+
+export const Ghost: Story = {
+  args: {
+    variant: "ghost",
   },
 }
 

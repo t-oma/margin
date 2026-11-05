@@ -68,6 +68,13 @@ const colorVariants = stylex.create({
     },
     color: colors.foregroundInverse,
   },
+  ghost: {
+    backgroundColor: {
+      default: "transparent",
+      ":enabled:hover": colors.iconButtonHover,
+    },
+    color: colors.foreground,
+  },
 })
 
 const sizeVariants = stylex.create({
