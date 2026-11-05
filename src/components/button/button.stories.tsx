@@ -2,13 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
 import { PlusIcon } from "lucide-react"
 
+import { spacing } from "@/tokens.stylex"
+
 import { Button } from "./button"
 
 const styles = stylex.create({
   wrapper: {
-    gap: "16px",
+    gap: spacing.space4,
     alignItems: "center",
     display: "flex",
+    flexWrap: "wrap",
   },
 })
 
@@ -21,6 +24,7 @@ const meta = {
     controls: {
       include: [
         "variant",
+        "destructive",
         "size",
         "children",
         "disabled",
@@ -31,12 +35,13 @@ const meta = {
     docs: {
       description: {
         component:
-          "A native button with primary, secondary, danger and ghost variants. Use Tab to check keyboard focus. Icon-only buttons need an accessible name through aria-label.",
+          "A native button with primary, secondary, and ghost variants. Destructive primary and secondary share a borderless filled appearance. Destructive ghost highlights on hover and keyboard focus. Icon-only buttons need an accessible name through aria-label.",
       },
     },
   },
   args: {
     variant: "primary",
+    destructive: false,
     size: "md",
     type: "button",
     disabled: false,
@@ -46,6 +51,10 @@ const meta = {
     variant: {
       control: "inline-radio",
       description: "Visual emphasis of the action.",
+    },
+    destructive: {
+      control: "boolean",
+      description: "Applies destructive styling to the selected variant.",
     },
     size: {
       control: "inline-radio",
@@ -92,11 +101,16 @@ export const Variants: Story = {
     docs: {
       description: {
         story:
-          "All color variants with shared content, size, and disabled state.",
+          "All six combinations of variant and destructive styling. Content, size, and disabled state are shared.",
       },
     },
   },
-  render: ({ variant: _variant, children, ...args }) => (
+  render: ({
+    variant: _variant,
+    destructive: _destructive,
+    children,
+    ...args
+  }) => (
     <div {...stylex.props(styles.wrapper)}>
       <Button variant="primary" {...args}>
         {children}
@@ -104,10 +118,13 @@ export const Variants: Story = {
       <Button variant="secondary" {...args}>
         {children}
       </Button>
-      <Button variant="danger" {...args}>
+      <Button variant="ghost" {...args}>
         {children}
       </Button>
-      <Button variant="ghost" {...args}>
+      <Button variant="primary" destructive {...args}>
+        {children}
+      </Button>
+      <Button variant="ghost" destructive {...args}>
         {children}
       </Button>
     </div>
@@ -122,15 +139,45 @@ export const Secondary: Story = {
   },
 }
 
-export const Danger: Story = {
-  args: {
-    variant: "danger",
-  },
-}
-
 export const Ghost: Story = {
   args: {
     variant: "ghost",
+  },
+}
+
+export const Destructive: Story = {
+  args: {
+    destructive: true,
+  },
+}
+
+export const DestructiveSecondary: Story = {
+  args: {
+    variant: "secondary",
+    destructive: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Secondary with destructive enabled uses the same borderless filled appearance as primary.",
+      },
+    },
+  },
+}
+
+export const DestructiveGhost: Story = {
+  args: {
+    variant: "ghost",
+    destructive: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Hover and keyboard focus apply the same destructive text and background colors. Use Tab to inspect the focus ring.",
+      },
+    },
   },
 }
 
@@ -147,6 +194,37 @@ export const Disabled: Story = {
   },
 }
 
+export const DestructiveDisabled: Story = {
+  args: {
+    destructive: true,
+    disabled: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled styling overrides the destructive text and background colors.",
+      },
+    },
+  },
+}
+
+export const DestructiveGhostDisabled: Story = {
+  args: {
+    variant: "ghost",
+    destructive: true,
+    disabled: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled destructive ghost keeps the shared disabled appearance and ignores hover.",
+      },
+    },
+  },
+}
+
 export const Icon: Story = {
   args: {
     size: "icon",
@@ -158,12 +236,19 @@ export const Icon: Story = {
   },
   parameters: {
     controls: {
-      include: ["variant", "size", "disabled", "type", "aria-label"],
+      include: [
+        "variant",
+        "destructive",
+        "size",
+        "disabled",
+        "type",
+        "aria-label",
+      ],
     },
     docs: {
       description: {
         story:
-          "An icon-only button with aria-label providing its accessible name.",
+          "An icon-only button with aria-label providing its accessible name. Use the variant and destructive controls to inspect combinations.",
       },
     },
   },
@@ -182,7 +267,7 @@ export const IconWithText: Story = {
   },
   parameters: {
     controls: {
-      include: ["variant", "size", "disabled", "type"],
+      include: ["variant", "destructive", "size", "disabled", "type"],
     },
     docs: {
       description: {

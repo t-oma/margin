@@ -61,7 +61,20 @@ const colorVariants = stylex.create({
     },
     color: colors.foreground,
   },
-  danger: {
+  ghost: {
+    backgroundColor: {
+      default: "transparent",
+      ":enabled:hover": colors.iconButtonHover,
+    },
+    color: colors.foreground,
+  },
+})
+
+const dangerVariants = stylex.create({
+  filled: {
+    borderColor: null,
+    borderStyle: null,
+    borderWidth: null,
     backgroundColor: {
       default: colors.danger,
       ":enabled:hover": colors.dangerHover,
@@ -69,11 +82,19 @@ const colorVariants = stylex.create({
     color: colors.foregroundInverse,
   },
   ghost: {
+    borderColor: null,
+    borderStyle: null,
+    borderWidth: null,
     backgroundColor: {
       default: "transparent",
-      ":enabled:hover": colors.iconButtonHover,
+      ":enabled:focus-visible": colors.dangerTint,
+      ":enabled:hover": colors.dangerTint,
     },
-    color: colors.foreground,
+    color: {
+      default: colors.foreground,
+      ":enabled:focus-visible": colors.dangerHover,
+      ":enabled:hover": colors.dangerHover,
+    },
   },
 })
 
@@ -98,6 +119,11 @@ type ButtonProps = WithoutStyleProps<ComponentPropsWithRef<"button">> & {
    * @default 'md'
    */
   size?: keyof typeof sizeVariants
+  /**
+   * @default false
+   */
+  destructive?: boolean
+
   children: ReactNode
 }
 
@@ -105,6 +131,7 @@ export function Button({
   variant = "primary",
   size = "md",
   type = "button",
+  destructive = false,
   disabled = false,
   children,
   ...props
@@ -118,6 +145,11 @@ export function Button({
         styles.root,
         focusRing.base,
         colorVariants[variant],
+        destructive
+          ? variant === "ghost"
+            ? dangerVariants.ghost
+            : dangerVariants.filled
+          : undefined,
         sizeVariants[size],
         disabled && styles.disabled
       )}
