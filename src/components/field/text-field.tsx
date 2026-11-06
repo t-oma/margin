@@ -21,6 +21,11 @@ const styles = stylex.create({
     flexGrow: 1,
     fontWeight: typography.fontWeightSemibold,
   },
+  fluid: {
+    flexGrow: 1,
+    minWidth: 0,
+    width: "100%",
+  },
   requiredMark: {
     color: colors.danger,
   },
@@ -32,6 +37,7 @@ type TextFieldProps = Omit<
 > & {
   label: ReactNode
   error?: string
+  fluid?: boolean
 }
 
 function RequiredMark() {
@@ -45,6 +51,7 @@ function RequiredMark() {
 export function TextField({
   label,
   error,
+  fluid = false,
   required,
   "aria-describedby": describedBy,
   ...inputProps
@@ -58,7 +65,7 @@ export function TextField({
     undefined
 
   return (
-    <div {...stylex.props(styles.root)}>
+    <div {...stylex.props(styles.root, fluid && styles.fluid)}>
       <label htmlFor={id} {...stylex.props(styles.label)}>
         {required && <RequiredMark />} <span>{label}</span>
       </label>
