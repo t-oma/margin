@@ -57,14 +57,14 @@ const colorVariants = stylex.create({
     borderWidth: "1px",
     backgroundColor: {
       default: colors.surface,
-      ":enabled:hover": colors.surfaceHover,
+      ":enabled:hover": colors.surfaceMuted,
     },
     color: colors.textPrimary,
   },
   ghost: {
     backgroundColor: {
       default: "transparent",
-      ":enabled:hover": colors.iconButtonHover,
+      ":enabled:hover": colors.surfaceMuted,
     },
     color: colors.textPrimary,
   },

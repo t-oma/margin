@@ -29,7 +29,7 @@ const styles = stylex.create({
   },
   disabled: {
     borderColor: colors.borderDisabled,
-    backgroundColor: colors.inputDisabled,
+    backgroundColor: colors.surfaceMuted,
     color: colors.textDisabled,
     cursor: "not-allowed",
     userSelect: "none",
@@ -39,7 +39,7 @@ const styles = stylex.create({
   },
   readOnly: {
     borderColor: colors.borderControl,
-    backgroundColor: colors.surfaceHover,
+    backgroundColor: colors.surfaceMuted,
     color: colors.textPrimary,
     cursor: "text",
   },

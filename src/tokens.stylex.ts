@@ -6,9 +6,8 @@ export const colors = stylex.defineVars({
   background: "#F6F7F9",
   surface: "#FFFFFF",
   subtle: "#FAFBFC",
-  surfaceHover: "#F1F3F6",
-  iconButtonHover: "#EEF0F3",
-  inputDisabled: "#EEF0F3",
+  // Subdued surfaces for control states.
+  surfaceMuted: "#EEF0F3",
   disabled: "#E4E7EC",
   badge: "#E9EBF0",
 
