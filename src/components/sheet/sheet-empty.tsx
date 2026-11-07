@@ -12,7 +12,7 @@ const styles = stylex.create({
     paddingTop: spacing.space4,
   },
   title: {
-    color: colors.foreground,
+    color: colors.textPrimary,
     fontSize: typography.fontSizeLg,
     fontWeight: typography.fontWeightBold,
     lineHeight: typography.lineHeightLg,
@@ -20,7 +20,7 @@ const styles = stylex.create({
     marginBottom: spacing.space2,
   },
   description: {
-    color: colors.foregroundMuted,
+    color: colors.textMuted,
     fontSize: typography.fontSizeSm,
     lineHeight: typography.lineHeightSm,
     textWrap: "pretty",

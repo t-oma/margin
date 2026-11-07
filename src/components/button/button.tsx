@@ -38,7 +38,7 @@ const styles = stylex.create({
   },
   disabled: {
     backgroundColor: colors.disabled,
-    color: colors.foregroundMuted,
+    color: colors.textDisabled,
     cursor: "not-allowed",
   },
 })
@@ -49,7 +49,7 @@ const colorVariants = stylex.create({
       default: colors.accent,
       ":enabled:hover": colors.accentHover,
     },
-    color: colors.foregroundInverse,
+    color: colors.textInverse,
   },
   secondary: {
     borderColor: colors.borderControl,
@@ -59,14 +59,14 @@ const colorVariants = stylex.create({
       default: colors.surface,
       ":enabled:hover": colors.surfaceHover,
     },
-    color: colors.foreground,
+    color: colors.textPrimary,
   },
   ghost: {
     backgroundColor: {
       default: "transparent",
       ":enabled:hover": colors.iconButtonHover,
     },
-    color: colors.foreground,
+    color: colors.textPrimary,
   },
 })
 
@@ -79,7 +79,7 @@ const dangerVariants = stylex.create({
       default: colors.danger,
       ":enabled:hover": colors.dangerHover,
     },
-    color: colors.foregroundInverse,
+    color: colors.textInverse,
   },
   ghost: {
     borderColor: null,
@@ -91,7 +91,7 @@ const dangerVariants = stylex.create({
       ":enabled:hover": colors.dangerTint,
     },
     color: {
-      default: colors.foreground,
+      default: colors.textPrimary,
       ":enabled:focus-visible": colors.dangerHover,
       ":enabled:hover": colors.dangerHover,
     },

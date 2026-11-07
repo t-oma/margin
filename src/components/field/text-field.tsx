@@ -16,10 +16,12 @@ const styles = stylex.create({
   },
   label: {
     gap: spacing.space1,
-    color: colors.foregroundSecondary,
+    color: colors.textPrimary,
     display: "inline-flex",
     flexGrow: 1,
+    fontSize: typography.fontSizeSm,
     fontWeight: typography.fontWeightSemibold,
+    lineHeight: typography.lineHeightSm,
   },
   fluid: {
     flexGrow: 1,

@@ -13,10 +13,14 @@ export const colors = stylex.defineVars({
   badge: "#E9EBF0",
 
   // Text
-  foreground: "#15171C",
-  foregroundSecondary: "#454B57",
-  foregroundMuted: "#5E6573",
-  foregroundInverse: "#FFFFFF",
+  // Main content, headings, and labels.
+  textPrimary: "#15171C",
+  // Descriptions, hints, and metadata.
+  textMuted: "#5E6573",
+  // Disabled controls can change independently of muted text.
+  textDisabled: "#5E6573",
+  // Text on dark or saturated backgrounds.
+  textInverse: "#FFFFFF",
 
   // Borders
   border: "#DCDFE5",

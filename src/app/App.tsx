@@ -10,6 +10,7 @@ import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 const styles = stylex.create({
   root: {
     backgroundColor: colors.background,
+    color: colors.textPrimary,
     fontFamily: typography.fontFamily,
     fontSize: typography.fontSizeMd,
     lineHeight: typography.lineHeightMd,
@@ -27,7 +28,7 @@ const styles = stylex.create({
     marginBottom: spacing.space1,
   },
   meta: {
-    color: colors.foregroundMuted,
+    color: colors.textMuted,
     fontSize: typography.fontSizeMd,
     marginBottom: spacing.space4,
   },
