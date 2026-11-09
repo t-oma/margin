@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex"
 import type { ReactNode } from "react"
 
-import { colors, radii } from "@/tokens.stylex"
+import { colors, radii, sizes } from "@/tokens.stylex"
 
 const styles = stylex.create({
   root: {
@@ -10,6 +10,18 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderWidth: "1px",
     backgroundColor: colors.surface,
+    position: "relative",
+  },
+  marginRule: {
+    pointerEvents: "none",
+    position: "absolute",
+    borderRightColor: colors.marginRule,
+    borderRightStyle: "solid",
+    borderRightWidth: sizes.marginRuleWidth,
+    bottom: 0,
+    left: 0,
+    top: 0,
+    width: sizes.marginWidth,
   },
 })
 
@@ -18,5 +30,11 @@ type SheetProps = {
 }
 
 export function Sheet({ children }: SheetProps) {
-  return <div {...stylex.props(styles.root)}>{children}</div>
+  return (
+    <div {...stylex.props(styles.root)}>
+      {children}
+
+      <span aria-hidden="true" {...stylex.props(styles.marginRule)}></span>
+    </div>
+  )
 }

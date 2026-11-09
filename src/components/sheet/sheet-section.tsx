@@ -19,9 +19,6 @@ const styles = stylex.create({
     display: "flex",
     flexShrink: 0,
     justifyContent: "center",
-    borderRightColor: colors.marginRule,
-    borderRightStyle: "solid",
-    borderRightWidth: sizes.marginRuleWidth,
     width: sizes.marginWidth,
   },
   body: {
