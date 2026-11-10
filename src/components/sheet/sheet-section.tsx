@@ -3,15 +3,17 @@ import type { ReactNode } from "react"
 
 import { colors, sizes, spacing } from "@/tokens.stylex"
 
+import { sheetSectionMarker } from "./sheet.stylex"
+
 const styles = stylex.create({
   root: {
     display: "flex",
-    borderBottomColor: colors.border,
-    borderBottomStyle: {
-      default: "solid",
-      ":last-child": "none",
+    borderTopColor: colors.border,
+    borderTopStyle: {
+      default: "none",
+      [stylex.when.siblingBefore(":is(*)", sheetSectionMarker)]: "solid",
     },
-    borderBottomWidth: "1px",
+    borderTopWidth: "1px",
   },
   margin: {
     padding: spacing.space1,
@@ -36,7 +38,7 @@ type SheetSectionProps = {
 
 export function SheetSection({ margin, children }: SheetSectionProps) {
   return (
-    <div {...stylex.props(styles.root)}>
+    <div {...stylex.props(styles.root, sheetSectionMarker)}>
       <div {...stylex.props(styles.margin)}>{margin}</div>
       <div {...stylex.props(styles.body)}>{children}</div>
     </div>

@@ -32,9 +32,9 @@ type SheetProps = {
 export function Sheet({ children }: SheetProps) {
   return (
     <div {...stylex.props(styles.root)}>
-      {children}
-
       <span aria-hidden="true" {...stylex.props(styles.marginRule)}></span>
+
+      {children}
     </div>
   )
 }
