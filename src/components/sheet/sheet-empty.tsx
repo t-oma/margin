@@ -3,13 +3,14 @@ import type { ReactNode } from "react"
 
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
+import { sheetLayout } from "./sheet.stylex"
+import { SheetMargin } from "./sheet-margin"
 import { SheetSection } from "./sheet-section"
 
 const styles = stylex.create({
   root: {
-    paddingBottom: spacing.space12,
-    paddingRight: spacing.space2,
-    paddingTop: spacing.space4,
+    paddingInlineEnd: spacing.space4,
+    paddingTop: spacing.space6,
   },
   title: {
     color: colors.textPrimary,
@@ -24,6 +25,9 @@ const styles = stylex.create({
     fontSize: typography.fontSizeSm,
     lineHeight: typography.lineHeightSm,
     textWrap: "pretty",
+  },
+  emptyRows: {
+    paddingTop: spacing.space12,
   },
   emptyRow: {
     borderTopColor: colors.borderRow,
@@ -42,15 +46,21 @@ type SheetEmptyProps = {
 export function SheetEmpty({ title, description }: SheetEmptyProps) {
   return (
     <SheetSection>
-      <div {...stylex.props(styles.root)}>
-        <h2 {...stylex.props(styles.title)}>{title}</h2>
-        {description && (
-          <p {...stylex.props(styles.description)}>{description}</p>
-        )}
-      </div>
+      <div {...stylex.props(sheetLayout.row)}>
+        <SheetMargin />
 
-      <div {...stylex.props(styles.emptyRow)} aria-hidden="true"></div>
-      <div {...stylex.props(styles.emptyRow)} aria-hidden="true"></div>
+        <div {...stylex.props(sheetLayout.body, styles.root)}>
+          <h2 {...stylex.props(styles.title)}>{title}</h2>
+          {description && (
+            <p {...stylex.props(styles.description)}>{description}</p>
+          )}
+
+          <div aria-hidden="true" {...stylex.props(styles.emptyRows)}>
+            <div {...stylex.props(styles.emptyRow)}></div>
+            <div {...stylex.props(styles.emptyRow)}></div>
+          </div>
+        </div>
+      </div>
     </SheetSection>
   )
 }

@@ -4,7 +4,13 @@ import { PlusIcon } from "lucide-react"
 import { Button } from "@/components/button"
 import { TextField } from "@/components/field"
 import { Header } from "@/components/header"
-import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
+import {
+  Sheet,
+  SheetEmpty,
+  sheetLayout,
+  SheetMargin,
+  SheetSection,
+} from "@/components/sheet"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
@@ -39,9 +45,8 @@ const styles = stylex.create({
     gap: spacing.space2,
     alignItems: "end",
     display: "flex",
-    flexGrow: 1,
-    paddingBottom: spacing.space6,
-    paddingTop: spacing.space1,
+    paddingBottom: spacing.space8,
+    paddingTop: spacing.space3,
   },
 })
 
@@ -55,19 +60,23 @@ function App() {
         <p {...stylex.props(styles.meta)}>No tasks yet</p>
 
         <Sheet>
-          <SheetSection
-            margin={<PlusIcon size={20} {...stylex.props(styles.plusIcon)} />}
-          >
-            <form {...stylex.props(styles.form)}>
-              <TextField
-                label="New Task"
-                placeholder="What needs doing?"
-                fluid
-              />
-              <Button type="submit" size="icon" aria-label="Add task">
-                <PlusIcon size={20} />
-              </Button>
-            </form>
+          <SheetSection>
+            <div {...stylex.props(sheetLayout.row)}>
+              <SheetMargin>
+                <PlusIcon size={20} {...stylex.props(styles.plusIcon)} />
+              </SheetMargin>
+
+              <form {...stylex.props(sheetLayout.body, styles.form)}>
+                <TextField
+                  label="New Task"
+                  placeholder="What needs doing?"
+                  fluid
+                />
+                <Button type="submit" size="icon" aria-label="Add task">
+                  <PlusIcon size={20} />
+                </Button>
+              </form>
+            </div>
           </SheetSection>
 
           <SheetEmpty

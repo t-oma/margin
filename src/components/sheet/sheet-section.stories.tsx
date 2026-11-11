@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
 import { PlusIcon } from "lucide-react"
+import type { ReactNode } from "react"
 
-import { colors, sizes } from "@/tokens.stylex"
+import { Checkbox } from "@/components/checkbox"
+import { colors, sizes, spacing } from "@/tokens.stylex"
 
 import { Sheet } from "./sheet"
+import { sheetLayout } from "./sheet.stylex"
+import { SheetMargin } from "./sheet-margin"
 import { SheetSection } from "./sheet-section"
 
 const styles = stylex.create({
@@ -12,10 +16,31 @@ const styles = stylex.create({
     maxWidth: sizes.contentMaxWidth,
     width: "100%",
   },
+  body: {
+    paddingBlock: spacing.space3,
+  },
   icon: {
     color: colors.accent,
   },
 })
+
+type RowProps = {
+  margin?: ReactNode
+  align?: "center" | "start"
+  children: ReactNode
+}
+
+function Row({ margin, align, children }: RowProps) {
+  return (
+    <div {...stylex.props(sheetLayout.row)}>
+      <SheetMargin align={align}>{margin}</SheetMargin>
+      <div {...stylex.props(sheetLayout.body, styles.body)}>{children}</div>
+    </div>
+  )
+}
+
+const longText =
+  "Review the task list layout, check keyboard navigation, and write down any changes needed before starting the next feature. Resize the preview to check that the content wraps while the notebook margin keeps its width."
 
 const meta = {
   title: "Components/Sheet/Section",
@@ -23,13 +48,10 @@ const meta = {
   tags: ["autodocs"],
   parameters: {
     layout: "padded",
-    controls: {
-      include: ["children"],
-    },
     docs: {
       description: {
         component:
-          "A sheet row with a fixed notebook margin and a flexible content area. The margin remains visible when empty. Render sections directly inside Sheet so the last section can omit its bottom divider.",
+          "Groups sheet rows and stacks them vertically. A section that follows another section draws a full-width divider above itself, so render sections directly inside Sheet. A row is a flex container with sheetLayout.row: SheetMargin first, then a content area with sheetLayout.body.",
       },
     },
   },
@@ -43,19 +65,13 @@ const meta = {
     ),
   ],
   args: {
-    children: "Plan the next small improvement to Margin.",
+    children: <Row>Plan the next small improvement to Margin.</Row>,
   },
   argTypes: {
     children: {
-      control: "text",
-      description: "Content displayed to the right of the notebook margin.",
-      table: {
-        type: { summary: "ReactNode" },
-      },
-    },
-    margin: {
       control: false,
-      description: "Optional content in the margin, such as a decorative icon.",
+      description:
+        "Rows built from sheetLayout.row, SheetMargin and sheetLayout.body.",
       table: {
         type: { summary: "ReactNode" },
       },
@@ -68,24 +84,63 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const WithMargin: Story = {
+export const WithMarginContent: Story = {
   args: {
-    margin: (
-      <PlusIcon size={20} aria-hidden="true" {...stylex.props(styles.icon)} />
+    children: (
+      <Row
+        margin={
+          <PlusIcon
+            size={20}
+            aria-hidden="true"
+            {...stylex.props(styles.icon)}
+          />
+        }
+      >
+        Plan the next small improvement to Margin.
+      </Row>
+    ),
+  },
+}
+
+export const MultipleRows: Story = {
+  args: {
+    children: (
+      <>
+        <Row margin={<span aria-hidden="true">1</span>}>
+          Rows inside a section stack vertically.
+        </Row>
+        <Row margin={<span aria-hidden="true">2</span>}>
+          The section adds no dividers between its own rows.
+        </Row>
+        <Row margin={<span aria-hidden="true">3</span>}>
+          Each row keeps the margin aligned with the rule.
+        </Row>
+      </>
     ),
   },
 }
 
 export const LongContent: Story = {
   args: {
-    children:
-      "Review the task list layout, check keyboard navigation, and write down any changes needed before starting the next feature. Resize the preview to check that the content wraps while the notebook margin keeps its width.",
+    children: (
+      <>
+        <Row margin={<Checkbox aria-label="Centered margin content" />}>
+          {longText}
+        </Row>
+        <Row
+          align="start"
+          margin={<Checkbox aria-label="Top-aligned margin content" />}
+        >
+          {longText}
+        </Row>
+      </>
+    ),
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Long text increases the section height. The notebook margin should stretch to the same height as the content.",
+          "Long text wraps and increases the row height while SheetMargin keeps its width. The first row uses the default align, which centers the margin content. The second uses align='start', which keeps it next to the first line, as a task checkbox needs.",
       },
     },
   },
