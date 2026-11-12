@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
-import { expect } from "storybook/test"
+import { expect, isInaccessible } from "storybook/test"
 
+import { VisuallyHidden } from "@/components/visually-hidden"
 import { spacing, typography } from "@/tokens.stylex"
 
 import { Badge } from "./badge"
@@ -83,6 +84,37 @@ export const Counts: Story = {
       description: {
         story:
           "Single digits fill the 24px minimum width. Tabular figures give 1 and 8 the same width, so the badge does not shift when the count changes. Longer values widen the badge.",
+      },
+    },
+  },
+}
+
+export const WithHiddenText: Story = {
+  render: () => (
+    <div {...stylex.props(styles.row)}>
+      <Badge>8</Badge>
+      <Badge>
+        8<VisuallyHidden> tasks</VisuallyHidden>
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const [plain, withHiddenText] = canvas.getAllByText("8")
+    const plainRect = plain.getBoundingClientRect()
+    const withHiddenTextRect = withHiddenText.getBoundingClientRect()
+
+    await expect(isInaccessible(canvas.getByText("tasks"))).toBe(false)
+    await expect(withHiddenTextRect.width).toBe(plainRect.width)
+    await expect(withHiddenTextRect.height).toBe(plainRect.height)
+  },
+  parameters: {
+    controls: {
+      disable: true,
+    },
+    docs: {
+      description: {
+        story:
+          "Add VisuallyHidden after the number so a screen reader reads '8 tasks'. Both badges look the same: the hidden text does not change the badge's size.",
       },
     },
   },
