@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
-import { PlusIcon } from "lucide-react"
-import type { ReactNode } from "react"
+import { CheckIcon } from "lucide-react"
+import { useState } from "react"
 
-import { Button } from "@/components/button"
-import { TextField } from "@/components/field"
+import { Badge } from "@/components/badge"
+import { Checkbox } from "@/components/checkbox"
+import { VisuallyHidden } from "@/components/visually-hidden"
 import { colors, sizes, spacing } from "@/tokens.stylex"
 
 import { Sheet } from "./sheet"
 import { sheetLayout } from "./sheet.stylex"
 import { SheetEmpty } from "./sheet-empty"
-import { SheetMargin } from "./sheet-margin"
 import { SheetSection } from "./sheet-section"
 
 const styles = stylex.create({
@@ -22,32 +22,75 @@ const styles = stylex.create({
     maxWidth: "100%",
     width: "18rem",
   },
-  body: {
+  // An example row, built the way a task row would be: sheetLayout for the
+  // margin and the body, local styles for the rest.
+  list: {
+    listStyle: "none",
+  },
+  row: {
+    borderTopColor: colors.borderRow,
+    borderTopStyle: {
+      default: "solid",
+      ":first-child": "none",
+    },
+    borderTopWidth: "1px",
+  },
+  marker: {
+    paddingTop: "2px",
+  },
+  title: {
     paddingBlock: spacing.space3,
-  },
-  form: {
-    gap: spacing.space2,
-    alignItems: "end",
-    display: "flex",
-    paddingBottom: spacing.space8,
-    paddingTop: spacing.space3,
-  },
-  icon: {
-    color: colors.accent,
+    overflowWrap: "anywhere",
   },
 })
 
-type RowProps = {
-  margin?: ReactNode
-  children: ReactNode
+function ExampleRows({ titles }: { titles: string[] }) {
+  return (
+    <ul role="list" {...stylex.props(styles.list)}>
+      {titles.map((title) => (
+        <li key={title} {...stylex.props(sheetLayout.row, styles.row)}>
+          <div {...stylex.props(sheetLayout.margin, styles.marker)}>
+            <Checkbox aria-label={`Mark as done: ${title}`} />
+          </div>
+          <div {...stylex.props(sheetLayout.body, styles.title)}>{title}</div>
+        </li>
+      ))}
+    </ul>
+  )
 }
 
-function Row({ margin, children }: RowProps) {
+function Count({ count }: { count: number }) {
   return (
-    <div {...stylex.props(sheetLayout.row)}>
-      <SheetMargin>{margin}</SheetMargin>
-      <div {...stylex.props(sheetLayout.body, styles.body)}>{children}</div>
-    </div>
+    <Badge>
+      {count}
+      <VisuallyHidden> {count === 1 ? "task" : "tasks"}</VisuallyHidden>
+    </Badge>
+  )
+}
+
+function SectionsExample() {
+  const [doneCollapsed, setDoneCollapsed] = useState(false)
+
+  return (
+    <Sheet>
+      <SheetSection title="To do" badge={<Count count={2} />}>
+        <ExampleRows
+          titles={[
+            "Pay the electricity bill",
+            "Send Olena the signed lease and scans of both IDs before Friday so she can submit everything to the agency",
+          ]}
+        />
+      </SheetSection>
+
+      <SheetSection
+        title="Done"
+        badge={<Count count={1} />}
+        collapsed={doneCollapsed}
+        onCollapsedChange={setDoneCollapsed}
+      >
+        <ExampleRows titles={["Book train tickets to Lviv"]} />
+      </SheetSection>
+    </Sheet>
   )
 }
 
@@ -60,7 +103,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A bordered notebook surface with a continuous margin rule. Compose it with SheetSection children or SheetEmpty, which includes its own section. Every section that follows another one draws a divider above itself.",
+          "A bordered notebook surface with a continuous margin rule. Compose it from SheetSection and SheetEmpty, plus row components built on sheetLayout, such as a task list or the composer. A section draws a divider above itself when it follows another section.",
       },
     },
   },
@@ -73,15 +116,13 @@ const meta = {
   ],
   args: {
     children: (
-      <SheetSection>
-        <Row>Plan the next small improvement to Margin.</Row>
-      </SheetSection>
+      <ExampleRows titles={["Plan the next small improvement to Margin."]} />
     ),
   },
   argTypes: {
     children: {
       control: false,
-      description: "Sheet sections and empty-state content.",
+      description: "Sections, empty states and row components.",
       table: {
         type: { summary: "ReactNode" },
       },
@@ -92,89 +133,83 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const SingleSection: Story = {}
-
-export const MultipleSections: Story = {
+export const Rows: Story = {
   args: {
     children: (
-      <>
-        <SheetSection>
-          <Row margin={<span aria-hidden="true">1</span>}>
-            Sections keep the notebook gutter aligned.
-          </Row>
-        </SheetSection>
-        <SheetSection>
-          <Row margin={<span aria-hidden="true">2</span>}>
-            A divider spans the full width between adjacent sections.
-          </Row>
-        </SheetSection>
-        <SheetSection>
-          <Row margin={<span aria-hidden="true">3</span>}>
-            The last section uses only the outer sheet border.
-          </Row>
-        </SheetSection>
-      </>
+      <ExampleRows
+        titles={[
+          "Rows keep the notebook gutter aligned.",
+          "A row built on sheetLayout draws its own divider.",
+          "The last row uses only the outer sheet border.",
+        ]}
+      />
     ),
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Check the continuous vertical rule, the dividers between sections, and the absence of an extra divider at the bottom.",
+          "Rows directly inside the sheet, built on sheetLayout the way a task row would be. Check the continuous vertical rule and the light dividers between rows.",
       },
     },
   },
 }
 
-export const WithComposer: Story = {
+export const Sections: Story = {
+  render: () => <SectionsExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A To do section and a collapsible Done section. The second section draws a full-width divider above its header. The toggle hides the Done list without removing it from the DOM.",
+      },
+    },
+  },
+}
+
+export const EmptySection: Story = {
   args: {
     children: (
       <>
-        <SheetSection>
-          <div {...stylex.props(sheetLayout.row)}>
-            <SheetMargin>
-              <PlusIcon
-                size={20}
-                aria-hidden="true"
-                {...stylex.props(styles.icon)}
-              />
-            </SheetMargin>
-
-            <form
-              {...stylex.props(sheetLayout.body, styles.form)}
-              onSubmit={(event) => event.preventDefault()}
-            >
-              <TextField
-                label="New Task"
-                name="title"
-                placeholder="What needs doing?"
-                fluid
-              />
-              <Button type="submit" size="icon" aria-label="Add task">
-                <PlusIcon size={20} aria-hidden="true" />
-              </Button>
-            </form>
-          </div>
+        <SheetSection title="To do" badge={<Count count={0} />}>
+          <SheetEmpty
+            marker={<CheckIcon size={20} aria-hidden="true" />}
+            title="All done. Nothing left to do."
+            description="New tasks you add will appear here."
+          />
         </SheetSection>
-        <SheetEmpty
-          title="Start your list"
-          description="Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device."
-        />
+        <SheetSection title="Done" badge={<Count count={0} />}>
+          <SheetEmpty
+            title="Nothing finished yet"
+            description="Tick a task’s checkbox and it moves here."
+          />
+        </SheetSection>
       </>
+    ),
+  },
+}
+
+export const FirstRun: Story = {
+  args: {
+    children: (
+      <SheetEmpty
+        size="lg"
+        title="Start your list"
+        description="Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device."
+      />
     ),
   },
   parameters: {
     docs: {
       description: {
-        story:
-          "The current homepage composition. Use Tab to check the field and button focus rings. Submission is prevented; this story demonstrates layout and does not create or save tasks.",
+        story: "The first-run empty state, which the composer sits above.",
       },
     },
   },
 }
 
 export const NarrowContainer: Story = {
-  ...WithComposer,
+  ...Sections,
   decorators: [
     (Story) => (
       <div {...stylex.props(styles.narrow)}>
@@ -186,7 +221,7 @@ export const NarrowContainer: Story = {
     docs: {
       description: {
         story:
-          "The composer and empty state inside a 288px container, matching the sheet width at a 320px viewport with page padding. Check that the field shrinks while the margin and add button keep their width.",
+          "The sections inside a 288px container, matching the sheet width at a 320px viewport with page padding. Check that task titles wrap while the margin and checkboxes keep their width.",
       },
     },
   },

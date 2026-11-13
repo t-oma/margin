@@ -1,46 +1,96 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
-import { PlusIcon } from "lucide-react"
-import type { ReactNode } from "react"
+import { type ComponentProps, useState } from "react"
 
+import { Badge } from "@/components/badge"
 import { Checkbox } from "@/components/checkbox"
+import { VisuallyHidden } from "@/components/visually-hidden"
 import { colors, sizes, spacing } from "@/tokens.stylex"
 
 import { Sheet } from "./sheet"
 import { sheetLayout } from "./sheet.stylex"
-import { SheetMargin } from "./sheet-margin"
+import { SheetEmpty } from "./sheet-empty"
 import { SheetSection } from "./sheet-section"
+
+type SheetSectionArgs = ComponentProps<typeof SheetSection>
 
 const styles = stylex.create({
   frame: {
     maxWidth: sizes.contentMaxWidth,
     width: "100%",
   },
-  body: {
-    paddingBlock: spacing.space3,
+  list: {
+    listStyle: "none",
   },
-  icon: {
-    color: colors.accent,
+  row: {
+    borderTopColor: colors.borderRow,
+    borderTopStyle: {
+      default: "solid",
+      ":first-child": "none",
+    },
+    borderTopWidth: "1px",
+  },
+  marker: {
+    paddingTop: "2px",
+  },
+  title: {
+    paddingBlock: spacing.space3,
+    overflowWrap: "anywhere",
   },
 })
 
-type RowProps = {
-  margin?: ReactNode
-  align?: "center" | "start"
-  children: ReactNode
-}
-
-function Row({ margin, align, children }: RowProps) {
+function ExampleRows({ titles }: { titles: string[] }) {
   return (
-    <div {...stylex.props(sheetLayout.row)}>
-      <SheetMargin align={align}>{margin}</SheetMargin>
-      <div {...stylex.props(sheetLayout.body, styles.body)}>{children}</div>
-    </div>
+    <ul role="list" {...stylex.props(styles.list)}>
+      {titles.map((title) => (
+        <li key={title} {...stylex.props(sheetLayout.row, styles.row)}>
+          <div {...stylex.props(sheetLayout.margin, styles.marker)}>
+            <Checkbox aria-label={`Mark as done: ${title}`} />
+          </div>
+          <div {...stylex.props(sheetLayout.body, styles.title)}>{title}</div>
+        </li>
+      ))}
+    </ul>
   )
 }
 
-const longText =
-  "Review the task list layout, check keyboard navigation, and write down any changes needed before starting the next feature. Resize the preview to check that the content wraps while the notebook margin keeps its width."
+function Count({ count }: { count: number }) {
+  return (
+    <Badge>
+      {count}
+      <VisuallyHidden> {count === 1 ? "task" : "tasks"}</VisuallyHidden>
+    </Badge>
+  )
+}
+
+const rows = (
+  <ExampleRows
+    titles={[
+      "Pay the electricity bill",
+      "Book train tickets to Lviv",
+      "Send Olena the signed lease and scans of both IDs",
+    ]}
+  />
+)
+
+function CollapsibleExample({
+  collapsed: _collapsed,
+  onCollapsedChange,
+  ...args
+}: SheetSectionArgs) {
+  const [collapsed, setCollapsed] = useState(false)
+
+  return (
+    <SheetSection
+      {...args}
+      collapsed={collapsed}
+      onCollapsedChange={(value) => {
+        setCollapsed(value)
+        onCollapsedChange?.(value)
+      }}
+    />
+  )
+}
 
 const meta = {
   title: "Components/Sheet/Section",
@@ -51,7 +101,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Groups sheet rows and stacks them vertically. A section that follows another section draws a full-width divider above itself, so render sections directly inside Sheet. A row is a flex container with sheetLayout.row: SheetMargin first, then a content area with sheetLayout.body.",
+          "A titled group of rows: a header with an h2, an optional badge and, when onCollapsedChange is given, a Hide/Show toggle, followed by the content. The section is a landmark named by its heading, and the toggle is named by its text and the heading, e.g. “Hide Done”. A section that follows another section draws a full-width divider above itself, so render sections directly inside Sheet.",
       },
     },
   },
@@ -65,13 +115,35 @@ const meta = {
     ),
   ],
   args: {
-    children: <Row>Plan the next small improvement to Margin.</Row>,
+    title: "To do",
+    badge: <Count count={3} />,
+    children: rows,
   },
   argTypes: {
-    children: {
+    title: {
+      control: "text",
+      table: {
+        type: { summary: "ReactNode" },
+      },
+    },
+    badge: {
+      control: false,
+      description: "Rendered next to the title, e.g. a count badge.",
+      table: {
+        type: { summary: "ReactNode" },
+      },
+    },
+    collapsed: {
+      control: "boolean",
+    },
+    onCollapsedChange: {
       control: false,
       description:
-        "Rows built from sheetLayout.row, SheetMargin and sheetLayout.body.",
+        "Makes the section collapsible. Without it the header has no toggle and `collapsed` is ignored.",
+    },
+    children: {
+      control: false,
+      description: "Row components or SheetEmpty.",
       table: {
         type: { summary: "ReactNode" },
       },
@@ -84,63 +156,57 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const WithMarginContent: Story = {
+export const WithoutBadge: Story = {
   args: {
-    children: (
-      <Row
-        margin={
-          <PlusIcon
-            size={20}
-            aria-hidden="true"
-            {...stylex.props(styles.icon)}
-          />
-        }
-      >
-        Plan the next small improvement to Margin.
-      </Row>
-    ),
+    badge: undefined,
   },
 }
 
-export const MultipleRows: Story = {
+export const Collapsible: Story = {
+  render: (args) => <CollapsibleExample {...args} />,
   args: {
-    children: (
-      <>
-        <Row margin={<span aria-hidden="true">1</span>}>
-          Rows inside a section stack vertically.
-        </Row>
-        <Row margin={<span aria-hidden="true">2</span>}>
-          The section adds no dividers between its own rows.
-        </Row>
-        <Row margin={<span aria-hidden="true">3</span>}>
-          Each row keeps the margin aligned with the rule.
-        </Row>
-      </>
-    ),
-  },
-}
-
-export const LongContent: Story = {
-  args: {
-    children: (
-      <>
-        <Row margin={<Checkbox aria-label="Centered margin content" />}>
-          {longText}
-        </Row>
-        <Row
-          align="start"
-          margin={<Checkbox aria-label="Top-aligned margin content" />}
-        >
-          {longText}
-        </Row>
-      </>
-    ),
+    title: "Done",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Long text wraps and increases the row height while SheetMargin keeps its width. The first row uses the default align, which centers the margin content. The second uses align='start', which keeps it next to the first line, as a task checkbox needs.",
+          "The toggle sets aria-expanded and aria-controls, and the content is hidden with the hidden attribute, so the controlled element stays in the DOM. Use Tab and Enter to check the toggle.",
+      },
+    },
+  },
+}
+
+export const Empty: Story = {
+  args: {
+    title: "Done",
+    badge: <Count count={0} />,
+    children: (
+      <SheetEmpty
+        title="Nothing finished yet"
+        description="Tick a task’s checkbox and it moves here."
+      />
+    ),
+  },
+}
+
+export const Adjacent: Story = {
+  render: (args) => (
+    <>
+      <SheetSection {...args} />
+      <SheetSection {...args} title="Done" badge={<Count count={0} />}>
+        <SheetEmpty
+          title="Nothing finished yet"
+          description="Tick a task’s checkbox and it moves here."
+        />
+      </SheetSection>
+    </>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two sections in a row. The second draws a divider above its header; the first has none because only the sheet border is above it.",
       },
     },
   },

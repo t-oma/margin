@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
+import { CheckIcon } from "lucide-react"
 
 import { sizes } from "@/tokens.stylex"
 
@@ -24,45 +25,47 @@ const meta = {
   parameters: {
     layout: "padded",
     controls: {
-      include: ["title", "description"],
+      include: ["title", "description", "size"],
     },
     docs: {
       description: {
         component:
-          "An empty-state section with a heading, an optional description, and two decorative ruled rows. Render it directly inside Sheet; it already includes SheetSection. The ruled rows are hidden from assistive technology.",
+          "An empty-state row with a title, an optional description and an optional marker in the notebook margin. The default size fits inside a section. The large size is the first-run state of an empty sheet and adds two decorative ruled lines, which are hidden from assistive technology.",
       },
     },
   },
   decorators: [
     (Story) => (
       <div {...stylex.props(styles.frame)}>
-        <Story />
+        <Sheet>
+          <Story />
+        </Sheet>
       </div>
     ),
   ],
-  render: (args) => (
-    <Sheet>
-      <SheetEmpty {...args} />
-    </Sheet>
-  ),
   args: {
-    title: "Start your list",
-    description:
-      "Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device.",
+    title: "Nothing finished yet",
+    description: "Tick a task’s checkbox and it moves here.",
   },
   argTypes: {
     title: {
       control: "text",
-      description: "The empty-state heading, rendered as an h2.",
       table: {
         type: { summary: "ReactNode" },
       },
     },
     description: {
       control: "text",
-      description: "Optional text explaining how to get started.",
+      description: "Optional text explaining what happens next.",
       table: {
         type: { summary: "ReactNode" },
+      },
+    },
+    size: {
+      control: "inline-radio",
+      options: ["md", "lg"],
+      table: {
+        defaultValue: { summary: "md" },
       },
     },
   },
@@ -73,21 +76,31 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+export const WithMarker: Story = {
+  args: {
+    marker: <CheckIcon size={20} aria-hidden="true" />,
+    title: "All done. Nothing left to do.",
+    description: "New tasks you add will appear here.",
+  },
+}
+
 export const WithoutDescription: Story = {
   args: {
     description: undefined,
   },
 }
 
-export const LongContent: Story = {
+export const FirstRun: Story = {
   args: {
-    title: "Give your next idea a place to start",
+    size: "lg",
+    title: "Start your list",
     description:
-      "Break a larger goal into small tasks you can finish one at a time. Start with the next concrete action, then add the details you need to remember when you return to your list.",
+      "Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device.",
   },
 }
 
 export const NarrowContainer: Story = {
+  ...FirstRun,
   decorators: [
     (Story) => (
       <div {...stylex.props(styles.narrow)}>
@@ -99,7 +112,7 @@ export const NarrowContainer: Story = {
     docs: {
       description: {
         story:
-          "A 288px container for checking heading and description wrapping at the minimum page width. The margin and decorative rows should remain inside the sheet.",
+          "The first-run state in a 288px container for checking title and description wrapping at the minimum page width. The margin and ruled lines should remain inside the sheet.",
       },
     },
   },

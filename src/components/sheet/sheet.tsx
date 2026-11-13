@@ -9,6 +9,9 @@ const styles = stylex.create({
     borderRadius: radii.xl,
     borderStyle: "solid",
     borderWidth: "1px",
+    // Clips row backgrounds at the rounded corners. Unlike `hidden`, `clip`
+    // creates no scroll container, so the sticky composer keeps working.
+    overflow: "clip",
     backgroundColor: colors.surface,
     position: "relative",
   },
