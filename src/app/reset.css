@@ -12,6 +12,12 @@ body {
   margin: 0;
 }
 
+:where(ul, ol) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 :where(h1, h2, h3, h4, h5, h6, p) {
   font-size: 1rem;
   font-weight: 400;
