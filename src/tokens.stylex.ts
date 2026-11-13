@@ -105,6 +105,7 @@ export const sizes = stylex.defineVars({
   marginWidth: "56px",
   marginWidthMobile: "52px",
   contentMaxWidth: "720px",
+  headerHeight: "56px",
   dialogMaxWidth: "440px",
   toastMaxWidth: "560px",
 

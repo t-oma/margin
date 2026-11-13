@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex"
 
-import { colors, spacing, zIndices } from "@/tokens.stylex"
+import { colors, sizes, spacing, zIndices } from "@/tokens.stylex"
 
 import { Brand } from "../brand"
 
@@ -15,7 +15,7 @@ const styles = stylex.create({
     borderBottomColor: colors.border,
     borderBottomStyle: "solid",
     borderBottomWidth: "1px",
-    height: "56px",
+    height: sizes.headerHeight,
     top: 0,
   },
 })
