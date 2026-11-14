@@ -40,8 +40,8 @@ export function TaskList({ tasks }: TaskListProps) {
         <li key={task.id} {...stylex.props(sheetLayout.row, styles.task)}>
           <div {...stylex.props(sheetLayout.margin, styles.taskMarker)}>
             <Checkbox
-              defaultChecked={task.completed}
-              aria-label={`${task.completed ? "Mark as not done" : "Mark as done"}: ${task.title}`}
+              defaultChecked={task.done}
+              aria-label={`${task.done ? "Mark as not done" : "Mark as done"}: ${task.title}`}
             />
           </div>
 
@@ -49,7 +49,7 @@ export function TaskList({ tasks }: TaskListProps) {
             {...stylex.props(
               sheetLayout.body,
               styles.taskTitle,
-              task.completed && styles.taskDone
+              task.done && styles.taskDone
             )}
           >
             {task.title}

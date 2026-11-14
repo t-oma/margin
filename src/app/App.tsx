@@ -4,7 +4,14 @@ import { useState } from "react"
 
 import { Header } from "@/components/header"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
-import { type Task, TaskComposer, TaskCount, TaskList } from "@/tasks"
+import {
+  completeTask,
+  createTask,
+  type Task,
+  TaskComposer,
+  TaskCount,
+  TaskList,
+} from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
@@ -36,11 +43,22 @@ const styles = stylex.create({
 
 function App() {
   const [tasks] = useState<Task[]>([
-    { id: 1, title: "Book train tickets to Lviv", completed: true },
-    { id: 2, title: "Pay the electricity bill", completed: false },
+    createTask(
+      crypto.randomUUID(),
+      "Book train tickets to Lviv",
+      new Date().toISOString()
+    ),
+    completeTask(
+      createTask(
+        crypto.randomUUID(),
+        "Pay the electricity bill",
+        new Date().toISOString()
+      ),
+      new Date().toISOString()
+    ),
   ])
-  const todoTasks = tasks.filter((task) => !task.completed)
-  const doneTasks = tasks.filter((task) => task.completed)
+  const todoTasks = tasks.filter((task) => !task.done)
+  const doneTasks = tasks.filter((task) => task.done)
   const [doneCollapsed, setDoneCollapsed] = useState(false)
 
   return (
