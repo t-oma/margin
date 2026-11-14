@@ -1,16 +1,10 @@
 import * as stylex from "@stylexjs/stylex"
-import { PlusIcon } from "lucide-react"
+import { CheckIcon } from "lucide-react"
+import { useState } from "react"
 
-import { Button } from "@/components/button"
-import { TextField } from "@/components/field"
 import { Header } from "@/components/header"
-import {
-  Sheet,
-  SheetEmpty,
-  sheetLayout,
-  SheetMargin,
-  SheetSection,
-} from "@/components/sheet"
+import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
+import { type Task, TaskComposer, TaskCount, TaskList } from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
@@ -38,19 +32,17 @@ const styles = stylex.create({
     fontSize: typography.fontSizeMd,
     marginBottom: spacing.space4,
   },
-  plusIcon: {
-    color: colors.accent,
-  },
-  form: {
-    gap: spacing.space2,
-    alignItems: "end",
-    display: "flex",
-    paddingBottom: spacing.space8,
-    paddingTop: spacing.space3,
-  },
 })
 
 function App() {
+  const [tasks] = useState<Task[]>([
+    { id: 1, title: "Book train tickets to Lviv", completed: true },
+    { id: 2, title: "Pay the electricity bill", completed: false },
+  ])
+  const todoTasks = tasks.filter((task) => !task.completed)
+  const doneTasks = tasks.filter((task) => task.completed)
+  const [doneCollapsed, setDoneCollapsed] = useState(false)
+
   return (
     <div {...stylex.props(styles.root)}>
       <Header />
@@ -60,29 +52,48 @@ function App() {
         <p {...stylex.props(styles.meta)}>No tasks yet</p>
 
         <Sheet>
-          <SheetSection>
-            <div {...stylex.props(sheetLayout.row)}>
-              <SheetMargin>
-                <PlusIcon size={20} {...stylex.props(styles.plusIcon)} />
-              </SheetMargin>
+          <TaskComposer onSubmit={(event) => event.preventDefault()} />
 
-              <form {...stylex.props(sheetLayout.body, styles.form)}>
-                <TextField
-                  label="New Task"
-                  placeholder="What needs doing?"
-                  fluid
-                />
-                <Button type="submit" size="icon" aria-label="Add task">
-                  <PlusIcon size={20} />
-                </Button>
-              </form>
-            </div>
-          </SheetSection>
+          {tasks.length === 0 ? (
+            <SheetEmpty
+              size="lg"
+              title="Start your list"
+              description="Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device."
+            />
+          ) : (
+            <>
+              <SheetSection
+                title="To do"
+                badge={<TaskCount count={todoTasks.length} />}
+              >
+                {todoTasks.length > 0 ? (
+                  <TaskList tasks={todoTasks} />
+                ) : (
+                  <SheetEmpty
+                    marker={<CheckIcon size={20} aria-hidden="true" />}
+                    title="All done. Nothing left to do."
+                    description="New tasks you add will appear here."
+                  />
+                )}
+              </SheetSection>
 
-          <SheetEmpty
-            title="Start your list"
-            description="Type the first thing you need to do in the field above and press Enter. Your tasks are saved in this browser, on this device."
-          />
+              <SheetSection
+                title="Done"
+                badge={<TaskCount count={doneTasks.length} />}
+                collapsed={doneCollapsed}
+                onCollapsedChange={setDoneCollapsed}
+              >
+                {doneTasks.length > 0 ? (
+                  <TaskList tasks={doneTasks} />
+                ) : (
+                  <SheetEmpty
+                    title="Nothing finished yet"
+                    description="Tick a task’s checkbox and it moves here."
+                  />
+                )}
+              </SheetSection>
+            </>
+          )}
         </Sheet>
       </main>
     </div>
