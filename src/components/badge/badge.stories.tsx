@@ -100,6 +100,7 @@ export const WithHiddenText: Story = {
   ),
   play: async ({ canvas }) => {
     const [plain, withHiddenText] = canvas.getAllByText("8")
+    if (!plain || !withHiddenText) throw new Error("Expected two badges")
     const plainRect = plain.getBoundingClientRect()
     const withHiddenTextRect = withHiddenText.getBoundingClientRect()
 
@@ -133,6 +134,7 @@ export const InlineAndFlex: Story = {
   ),
   play: async ({ canvas }) => {
     const [inline, flexItem] = canvas.getAllByText("8")
+    if (!inline || !flexItem) throw new Error("Expected two badges")
 
     await expect(inline.getBoundingClientRect().height).toBe(
       flexItem.getBoundingClientRect().height
