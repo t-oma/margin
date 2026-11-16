@@ -1,17 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
 import { CheckIcon } from "lucide-react"
-import { useState } from "react"
 
 import { Header } from "@/components/header"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
-import {
-  completeTask,
-  createTask,
-  type Task,
-  TaskComposer,
-  TaskCount,
-  TaskList,
-} from "@/tasks"
+import { TaskComposer, TaskCount, TaskList, useTasks } from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
@@ -42,24 +34,8 @@ const styles = stylex.create({
 })
 
 function App() {
-  const [tasks] = useState<Task[]>([
-    createTask(
-      crypto.randomUUID(),
-      "Book train tickets to Lviv",
-      new Date().toISOString()
-    ),
-    completeTask(
-      createTask(
-        crypto.randomUUID(),
-        "Pay the electricity bill",
-        new Date().toISOString()
-      ),
-      new Date().toISOString()
-    ),
-  ])
-  const todoTasks = tasks.filter((task) => !task.done)
-  const doneTasks = tasks.filter((task) => task.done)
-  const [doneCollapsed, setDoneCollapsed] = useState(false)
+  const { tasks, todo, done, doneCollapsed, setDoneCollapsed, toggle } =
+    useTasks()
 
   return (
     <div {...stylex.props(styles.root)}>
@@ -82,10 +58,10 @@ function App() {
             <>
               <SheetSection
                 title="To do"
-                badge={<TaskCount count={todoTasks.length} />}
+                badge={<TaskCount count={todo.length} />}
               >
-                {todoTasks.length > 0 ? (
-                  <TaskList tasks={todoTasks} />
+                {todo.length > 0 ? (
+                  <TaskList tasks={todo} onToggle={toggle} />
                 ) : (
                   <SheetEmpty
                     marker={<CheckIcon size={20} aria-hidden="true" />}
@@ -97,12 +73,12 @@ function App() {
 
               <SheetSection
                 title="Done"
-                badge={<TaskCount count={doneTasks.length} />}
+                badge={<TaskCount count={done.length} />}
                 collapsed={doneCollapsed}
                 onCollapsedChange={setDoneCollapsed}
               >
-                {doneTasks.length > 0 ? (
-                  <TaskList tasks={doneTasks} />
+                {done.length > 0 ? (
+                  <TaskList tasks={done} onToggle={toggle} />
                 ) : (
                   <SheetEmpty
                     title="Nothing finished yet"

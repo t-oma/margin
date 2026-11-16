@@ -31,16 +31,20 @@ const styles = stylex.create({
   },
 })
 
-type TaskListProps = { tasks: Task[] }
+type TaskListProps = {
+  tasks: Task[]
+  onToggle: (id: string) => void
+}
 
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList({ tasks, onToggle }: TaskListProps) {
   return (
     <ul role="list" {...stylex.props(styles.root)}>
       {tasks.map((task) => (
         <li key={task.id} {...stylex.props(sheetLayout.row, styles.task)}>
           <div {...stylex.props(sheetLayout.margin, styles.taskMarker)}>
             <Checkbox
-              defaultChecked={task.done}
+              checked={task.done}
+              onChange={() => onToggle(task.id)}
               aria-label={`${task.done ? "Mark as not done" : "Mark as done"}: ${task.title}`}
             />
           </div>
