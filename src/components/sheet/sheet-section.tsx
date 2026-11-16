@@ -3,7 +3,8 @@ import { type ReactNode, useId } from "react"
 
 import { colors, spacing, typography } from "@/tokens.stylex"
 
-import { sheetLayout, sheetSectionMarker } from "./sheet.stylex"
+import { sheetSectionMarker } from "./sheet.stylex"
+import { sheetLayout } from "./sheet-layout"
 import { SheetSectionToggle } from "./sheet-section-toggle"
 
 const styles = stylex.create({

@@ -16,13 +16,22 @@ export default defineConfig([
     files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      tseslint.configs.strictTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       eslintConfigPrettier,
     ],
     languageOptions: {
       globals: globals.browser,
+      parserOptions: {
+        // Type-aware rules read each file's types from its tsconfig.
+        projectService: {
+          // In no tsconfig: its docgen plugin types break under nodenext.
+          allowDefaultProject: [".storybook/main.ts"],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       "@stylexjs": stylex,
@@ -31,6 +40,9 @@ export default defineConfig([
       "@stylexjs/valid-styles": "error",
       "@stylexjs/valid-shorthands": "error",
       "@stylexjs/no-conflicting-props": "error",
+      "@stylexjs/no-unused": "error",
+      "@stylexjs/enforce-extension": "error",
+      "@stylexjs/no-legacy-contextual-styles": "error",
       "@stylexjs/sort-keys": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -38,6 +50,20 @@ export default defineConfig([
           argsIgnorePattern: "^_",
           ignoreRestSiblings: true,
         },
+      ],
+      // The code uses type aliases throughout.
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      // Method signatures skip strictFunctionTypes and look unsafe to pass
+      // around; property signatures do neither.
+      "@typescript-eslint/method-signature-style": ["error", "property"],
+      "@typescript-eslint/switch-exhaustiveness-check": "error",
+      "@typescript-eslint/no-confusing-void-expression": [
+        "error",
+        { ignoreArrowShorthand: true },
+      ],
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        { allowNumber: true },
       ],
     },
   },

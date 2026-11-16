@@ -44,6 +44,7 @@ export type TitleResult =
 export function validateTitle(raw: string): TitleResult {
   const title = raw.replace(/\r\n|[\r\n]/g, " ").trim()
   // Counts code points, so an emoji such as 👍 is one character, not two.
+  // eslint-disable-next-line @typescript-eslint/no-misused-spread -- the spec counts code points
   const length = [...title].length
 
   if (length === 0) return { ok: false, error: "empty" }

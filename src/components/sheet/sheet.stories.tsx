@@ -9,8 +9,8 @@ import { VisuallyHidden } from "@/components/visually-hidden"
 import { colors, sizes, spacing } from "@/tokens.stylex"
 
 import { Sheet } from "./sheet"
-import { sheetLayout } from "./sheet.stylex"
 import { SheetEmpty } from "./sheet-empty"
+import { sheetLayout } from "./sheet-layout"
 import { SheetSection } from "./sheet-section"
 
 const styles = stylex.create({

@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
-import { sheetLayout } from "./sheet.stylex"
+import { sheetLayout } from "./sheet-layout"
 
 const styles = stylex.create({
   // Centers the marker on the first line of the title.

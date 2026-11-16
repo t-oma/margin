@@ -26,18 +26,18 @@ export type TaskStoreSnapshot = {
 }
 
 export type TaskStore = {
-  getSnapshot(): TaskStoreSnapshot
-  subscribe(listener: () => void): () => void
-  add(rawTitle: string): TitleResult
-  rename(
+  getSnapshot: () => TaskStoreSnapshot
+  subscribe: (listener: () => void) => () => void
+  add: (rawTitle: string) => TitleResult
+  rename: (
     id: string,
     rawTitle: string
-  ): TitleResult | { ok: true; unchanged: true }
-  toggle(id: string): void
-  remove(id: string): void
-  setDoneCollapsed(collapsed: boolean): void
-  retrySave(): boolean
-  destroy(): void
+  ) => TitleResult | { ok: true; unchanged: true }
+  toggle: (id: string) => void
+  remove: (id: string) => void
+  setDoneCollapsed: (collapsed: boolean) => void
+  retrySave: () => boolean
+  destroy: () => void
 }
 
 export function createTaskStore({
