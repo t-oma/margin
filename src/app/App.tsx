@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { CheckIcon } from "lucide-react"
+import { CheckIcon, DotIcon } from "lucide-react"
 
 import { Header } from "@/components/header"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
@@ -27,14 +27,17 @@ const styles = stylex.create({
     marginBottom: spacing.space1,
   },
   meta: {
+    alignItems: "center",
     color: colors.textMuted,
-    fontSize: typography.fontSizeMd,
+    display: "inline-flex",
+    fontSize: typography.fontSizeSm,
+    lineHeight: typography.lineHeightSm,
     marginBottom: spacing.space4,
   },
 })
 
 function App() {
-  const { tasks, todo, done, doneCollapsed, setDoneCollapsed, toggle } =
+  const { tasks, todo, done, doneCollapsed, add, setDoneCollapsed, toggle } =
     useTasks()
 
   return (
@@ -42,11 +45,19 @@ function App() {
       <Header />
 
       <main {...stylex.props(styles.main)}>
-        <h1 {...stylex.props(styles.heading)}>My Tasks</h1>
-        <p {...stylex.props(styles.meta)}>No tasks yet</p>
+        <h1 {...stylex.props(styles.heading)}>My tasks</h1>
+        <p {...stylex.props(styles.meta)}>
+          {tasks.length === 0 ? (
+            "No tasks yet"
+          ) : (
+            <>
+              {todo.length} to do <DotIcon size={20} /> {done.length} done
+            </>
+          )}
+        </p>
 
         <Sheet>
-          <TaskComposer onSubmit={(event) => event.preventDefault()} />
+          <TaskComposer onAdd={add} />
 
           {tasks.length === 0 ? (
             <SheetEmpty

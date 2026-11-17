@@ -1,11 +1,14 @@
 import * as stylex from "@stylexjs/stylex"
 import { PlusIcon } from "lucide-react"
-import type { SubmitEventHandler } from "react"
+import { type SubmitEvent, useRef, useState } from "react"
 
 import { Button } from "@/components/button"
 import { TextField } from "@/components/field"
 import { sheetLayout } from "@/components/sheet"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
+
+import { type TitleError, type TitleResult, validateTitle } from "../model"
+import { titleErrorMessage } from "./title-messages"
 
 const styles = stylex.create({
   root: {
@@ -29,9 +32,30 @@ const styles = stylex.create({
   },
 })
 
-type TaskComposerProps = { onSubmit: SubmitEventHandler<HTMLFormElement> }
+const EMPTY: TitleError = { ok: false, error: "empty" }
 
-export function TaskComposer({ onSubmit }: TaskComposerProps) {
+type TaskComposerProps = { onAdd: (title: string) => TitleResult }
+
+export function TaskComposer({ onAdd }: TaskComposerProps) {
+  const [title, setTitle] = useState("")
+  // An empty field is normal, so "empty" shows only after a submit.
+  const [triedEmpty, setTriedEmpty] = useState(false)
+  const fieldRef = useRef<HTMLInputElement>(null)
+
+  // "long" follows the text while it is typed.
+  const live = validateTitle(title)
+  const tooLong = !live.ok && live.error === "long" ? live : null
+  const error = tooLong ?? (triedEmpty ? EMPTY : null)
+
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault()
+    fieldRef.current?.focus()
+    if (tooLong) return // the error is on screen; keep the text
+
+    if (onAdd(title).ok) setTitle("")
+    else setTriedEmpty(true)
+  }
+
   return (
     <div {...stylex.props(sheetLayout.row, styles.root)}>
       <div {...stylex.props(sheetLayout.margin)}>
@@ -41,10 +65,22 @@ export function TaskComposer({ onSubmit }: TaskComposerProps) {
       </div>
 
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         {...stylex.props(sheetLayout.body, styles.form)}
       >
-        <TextField label="New Task" placeholder="What needs doing?" fluid />
+        <TextField
+          ref={fieldRef}
+          label="New task"
+          placeholder="What needs doing?"
+          autoComplete="off"
+          fluid
+          value={title}
+          error={error ? titleErrorMessage(error) : undefined}
+          onInput={(event) => {
+            setTitle(event.currentTarget.value)
+            setTriedEmpty(false)
+          }}
+        />
 
         <Button type="submit" size="icon" aria-label="Add task">
           <PlusIcon size={20} aria-hidden="true" />

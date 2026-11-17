@@ -41,6 +41,8 @@ export type TitleResult =
   | { ok: false; error: "empty" }
   | { ok: false; error: "long"; over: number }
 
+export type TitleError = Extract<TitleResult, { ok: false }>
+
 export function validateTitle(raw: string): TitleResult {
   const title = raw.replace(/\r\n|[\r\n]/g, " ").trim()
   // Counts code points, so an emoji such as 👍 is one character, not two.
