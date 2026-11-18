@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex"
 import { useId } from "react"
 import { expect, isInaccessible } from "storybook/test"
 
-import { Input } from "@/components/input"
+import { Textarea } from "@/components/textarea"
 import { visuallyHidden } from "@/styles/visually-hidden"
 
 import { VisuallyHidden } from "./visually-hidden"
@@ -24,7 +24,7 @@ function HiddenLabelExample() {
       <label htmlFor={id} {...stylex.props(visuallyHidden.base)}>
         Edit task title
       </label>
-      <Input id={id} defaultValue="Pay rent" />
+      <Textarea id={id} defaultValue="Pay rent" />
     </div>
   )
 }

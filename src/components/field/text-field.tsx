@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex"
 import { type ReactNode, useId } from "react"
 
+import { Textarea, type TextareaProps } from "@/components/textarea"
 import { colors, spacing, typography } from "@/tokens.stylex"
 
-import { Input, type InputProps } from "../input"
 import { FieldError } from "./field-error"
 
 const styles = stylex.create({
@@ -34,7 +34,7 @@ const styles = stylex.create({
 })
 
 type TextFieldProps = Omit<
-  InputProps,
+  TextareaProps,
   "type" | "id" | "aria-required" | "aria-invalid"
 > & {
   label: ReactNode
@@ -56,7 +56,7 @@ export function TextField({
   fluid = false,
   required,
   "aria-describedby": describedBy,
-  ...inputProps
+  ...textareaProps
 }: TextFieldProps) {
   const id = useId()
 
@@ -72,14 +72,13 @@ export function TextField({
         {required && <RequiredMark />} <span>{label}</span>
       </label>
 
-      <Input
+      <Textarea
         id={id}
-        type="text"
         required={required}
         aria-required={required ? "true" : undefined}
         aria-invalid={error ? "true" : undefined}
         aria-describedby={descriptionIds}
-        {...inputProps}
+        {...textareaProps}
       />
 
       <FieldError id={errorId} error={error} />

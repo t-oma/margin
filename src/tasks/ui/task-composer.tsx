@@ -40,7 +40,7 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
   const [title, setTitle] = useState("")
   // An empty field is normal, so "empty" shows only after a submit.
   const [triedEmpty, setTriedEmpty] = useState(false)
-  const fieldRef = useRef<HTMLInputElement>(null)
+  const fieldRef = useRef<HTMLTextAreaElement>(null)
 
   // "long" follows the text while it is typed.
   const live = validateTitle(title)
@@ -80,6 +80,7 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
             setTitle(event.currentTarget.value)
             setTriedEmpty(false)
           }}
+          submitOnEnter
         />
 
         <Button type="submit" size="icon" aria-label="Add task">
