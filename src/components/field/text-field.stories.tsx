@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as stylex from "@stylexjs/stylex"
+import { expect } from "storybook/test"
 
 import { spacing } from "@/tokens.stylex"
 
@@ -30,6 +31,8 @@ const meta = {
     controls: {
       include: [
         "label",
+        "hint",
+        "counter",
         "error",
         "placeholder",
         "disabled",
@@ -40,7 +43,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A text field combining a label, a text input, and an optional error message. Use Tab to check keyboard focus and click the label to check its connection to the input.",
+          "A text field combining a label, a multi-line text control that grows with its text, and a help line: a hint or an error, and an optional counter. Use Tab to check keyboard focus and click the label to check its connection to the field.",
       },
     },
   },
@@ -54,6 +57,8 @@ const meta = {
   args: {
     label: "Task title",
     name: "title",
+    hint: "",
+    counter: "",
     error: "",
     placeholder: "",
     disabled: false,
@@ -62,6 +67,8 @@ const meta = {
   },
   argTypes: {
     label: { control: "text" },
+    hint: { control: "text" },
+    counter: { control: "text" },
     error: { control: "text" },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
@@ -97,6 +104,69 @@ export const Required: Story = {
 export const Error: Story = {
   args: {
     error: "Enter a task title.",
+  },
+}
+
+export const Hint: Story = {
+  args: {
+    label: "New task",
+    placeholder: "What needs doing?",
+    hint: "Press Enter to add",
+  },
+  play: async ({ canvas }) => {
+    const field = canvas.getByRole("textbox", { name: "New task" })
+
+    await expect(field).toHaveAccessibleDescription("Press Enter to add")
+  },
+}
+
+export const Counter: Story = {
+  args: {
+    label: "New task",
+    defaultValue: "Write the handover note for the flat",
+    hint: "Press Enter to add",
+    counter: "192/200",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The counter sits at the end of the help line and is part of the field's description.",
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const field = canvas.getByRole("textbox", { name: "New task" })
+
+    await expect(field).toHaveAccessibleDescription(
+      "Press Enter to add 192/200"
+    )
+  },
+}
+
+export const ErrorWithCounter: Story = {
+  args: {
+    label: "New task",
+    defaultValue: "Write the handover note for the flat",
+    hint: "Press Enter to add",
+    counter: "226/200",
+    error: "Shorten the title by 26 characters — the limit is 200.",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "An error takes the hint's place, and the counter turns red.",
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const field = canvas.getByRole("textbox", { name: "New task" })
+
+    await expect(field).toBeInvalid()
+    await expect(canvas.queryByText("Press Enter to add")).toBeNull()
+    await expect(field).toHaveAccessibleDescription(
+      "Shorten the title by 26 characters — the limit is 200. 226/200"
+    )
   },
 }
 

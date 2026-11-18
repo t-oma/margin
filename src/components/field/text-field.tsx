@@ -4,6 +4,7 @@ import { type ReactNode, useId } from "react"
 import { Textarea, type TextareaProps } from "@/components/textarea"
 import { colors, spacing, typography } from "@/tokens.stylex"
 
+import { FieldCounter } from "./field-counter"
 import { FieldError } from "./field-error"
 
 const styles = stylex.create({
@@ -31,6 +32,18 @@ const styles = stylex.create({
   requiredMark: {
     color: colors.danger,
   },
+  // The line under the field: the hint or the error, then the counter.
+  help: {
+    gap: spacing.space2,
+    alignItems: "flex-start",
+    display: "flex",
+  },
+  hint: {
+    paddingBlock: spacing.space1,
+    color: colors.textMuted,
+    fontSize: typography.fontSizeXs,
+    lineHeight: typography.lineHeightXs,
+  },
 })
 
 type TextFieldProps = Omit<
@@ -39,6 +52,10 @@ type TextFieldProps = Omit<
 > & {
   label: ReactNode
   error?: string
+  /** Help under the field, such as "Press Enter to add". An error replaces it. */
+  hint?: ReactNode
+  /** Shown at the end of the help line, such as "192/200". */
+  counter?: ReactNode
   fluid?: boolean
 }
 
@@ -53,6 +70,8 @@ function RequiredMark() {
 export function TextField({
   label,
   error,
+  hint,
+  counter,
   fluid = false,
   required,
   "aria-describedby": describedBy,
@@ -61,10 +80,21 @@ export function TextField({
   const id = useId()
 
   const errorId = `${id}-error`
+  const hintId = `${id}-hint`
+  const counterId = `${id}-counter`
+
+  const hasError = Boolean(error)
+  const hasHint = Boolean(hint)
+  const hasCounter = Boolean(counter)
 
   const descriptionIds =
-    [describedBy, error ? errorId : undefined].filter(Boolean).join(" ") ||
-    undefined
+    [
+      describedBy,
+      hasError ? errorId : hasHint ? hintId : undefined,
+      hasCounter ? counterId : undefined,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined
 
   return (
     <div {...stylex.props(styles.root, fluid && styles.fluid)}>
@@ -81,7 +111,25 @@ export function TextField({
         {...textareaProps}
       />
 
-      <FieldError id={errorId} error={error} />
+      {(hasError || hasHint || hasCounter) && (
+        <div {...stylex.props(styles.help)}>
+          {hasError ? (
+            <FieldError id={errorId} error={error} />
+          ) : (
+            hasHint && (
+              <span id={hintId} {...stylex.props(styles.hint)}>
+                {hint}
+              </span>
+            )
+          )}
+
+          {hasCounter && (
+            <FieldCounter id={counterId} invalid={hasError}>
+              {counter}
+            </FieldCounter>
+          )}
+        </div>
+      )}
     </div>
   )
 }
