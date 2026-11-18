@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex"
 import { CheckIcon, DotIcon } from "lucide-react"
 
 import { Header } from "@/components/header"
+import { LiveRegion } from "@/components/live-region"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
 import { TaskComposer, TaskCount, TaskList, useTasks } from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
@@ -101,6 +102,8 @@ function App() {
           )}
         </Sheet>
       </main>
+
+      <LiveRegion />
     </div>
   )
 }
