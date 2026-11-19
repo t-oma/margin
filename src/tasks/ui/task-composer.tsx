@@ -4,10 +4,17 @@ import { type SubmitEvent, useRef, useState } from "react"
 
 import { Button } from "@/components/button"
 import { TextField } from "@/components/field"
+import { announce } from "@/components/live-region"
 import { sheetLayout } from "@/components/sheet"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
-import { type TitleError, type TitleResult, validateTitle } from "../model"
+import {
+  TASK_MAX_TITLE_LENGTH,
+  type TitleError,
+  titleLength,
+  validateTitle,
+} from "../model"
+import type { AddResult } from "../store"
 import { titleErrorMessage } from "./title-messages"
 
 const styles = stylex.create({
@@ -30,11 +37,18 @@ const styles = stylex.create({
     paddingBottom: spacing.space8,
     paddingTop: spacing.space3,
   },
+  // Lines the button up with the field, which sits below the field label.
+  action: {
+    marginTop: `calc(${typography.lineHeightSm} + ${spacing.space1})`,
+  },
 })
 
 const EMPTY: TitleError = { ok: false, error: "empty" }
 
-type TaskComposerProps = { onAdd: (title: string) => TitleResult }
+// The counter shows from this length up, before the limit is reached.
+const COUNTER_FROM = 180
+
+type TaskComposerProps = { onAdd: (title: string) => AddResult }
 
 export function TaskComposer({ onAdd }: TaskComposerProps) {
   const [title, setTitle] = useState("")
@@ -46,14 +60,26 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
   const live = validateTitle(title)
   const tooLong = !live.ok && live.error === "long" ? live : null
   const error = tooLong ?? (triedEmpty ? EMPTY : null)
+  const length = titleLength(title)
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
-    fieldRef.current?.focus()
-    if (tooLong) return // the error is on screen; keep the text
+    fieldRef.current?.focus() // the Add task button must not keep focus
 
-    if (onAdd(title).ok) setTitle("")
-    else setTriedEmpty(true)
+    if (tooLong) {
+      // The error is already on screen: keep the text and say it again.
+      announce(titleErrorMessage(tooLong))
+      return
+    }
+
+    const result = onAdd(title)
+    if (result.ok) {
+      setTitle("")
+      announce(`Task added: ${result.task.title}`)
+    } else {
+      setTriedEmpty(true)
+      announce(titleErrorMessage(result))
+    }
   }
 
   return (
@@ -72,7 +98,15 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
           ref={fieldRef}
           label="New task"
           placeholder="What needs doing?"
+          hint="Press Enter to add"
+          counter={
+            length >= COUNTER_FROM
+              ? `${String(length)}/${String(TASK_MAX_TITLE_LENGTH)}`
+              : undefined
+          }
           autoComplete="off"
+          spellCheck
+          submitOnEnter
           fluid
           value={title}
           error={error ? titleErrorMessage(error) : undefined}
@@ -80,12 +114,13 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
             setTitle(event.currentTarget.value)
             setTriedEmpty(false)
           }}
-          submitOnEnter
         />
 
-        <Button type="submit" size="icon" aria-label="Add task">
-          <PlusIcon size={20} aria-hidden="true" />
-        </Button>
+        <div {...stylex.props(styles.action)}>
+          <Button type="submit" size="icon" aria-label="Add task">
+            <PlusIcon size={20} aria-hidden="true" />
+          </Button>
+        </div>
       </form>
     </div>
   )
