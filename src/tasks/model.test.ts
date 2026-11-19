@@ -7,6 +7,7 @@ import {
   renameTask,
   reopenTask,
   TASK_MAX_TITLE_LENGTH,
+  titleLength,
   todoTasks,
   validateTitle,
 } from "./model"
@@ -99,6 +100,11 @@ describe("validateTitle", () => {
   it.each(["", "   ", "\r\n"])("rejects %j as empty", (raw) => {
     expect(validateTitle(raw)).toEqual({ ok: false, error: "empty" })
   })
+})
+
+test("titleLength counts code points after normalising", () => {
+  expect(titleLength("  👍 Pay\r\nrent \n")).toBe(10)
+  expect(titleLength("   ")).toBe(0)
 })
 
 test("To do lists the newest task first", () => {

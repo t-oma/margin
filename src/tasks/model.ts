@@ -13,7 +13,7 @@ export type DoneTask = Extract<Task, { done: true }>
 
 export const TASK_MAX_TITLE_LENGTH = 200
 
-export function createTask(id: string, title: string, now: string): Task {
+export function createTask(id: string, title: string, now: string): OpenTask {
   return {
     id,
     title,
@@ -24,11 +24,11 @@ export function createTask(id: string, title: string, now: string): Task {
   }
 }
 
-export function completeTask(task: Task, now: string): Task {
+export function completeTask(task: Task, now: string): DoneTask {
   return { ...task, done: true, completedAt: now }
 }
 
-export function reopenTask(task: Task): Task {
+export function reopenTask(task: Task): OpenTask {
   return { ...task, done: false, completedAt: null }
 }
 
@@ -43,11 +43,25 @@ export type TitleResult =
 
 export type TitleError = Extract<TitleResult, { ok: false }>
 
-export function validateTitle(raw: string): TitleResult {
-  const title = raw.replace(/\r\n|[\r\n]/g, " ").trim()
-  // Counts code points, so an emoji such as 👍 is one character, not two.
+// Each line break becomes a space and the ends are trimmed; inner spaces stay.
+function normaliseTitle(raw: string) {
+  return raw.replace(/\r\n|[\r\n]/g, " ").trim()
+}
+
+// Counts code points, so an emoji such as 👍 is one character, not two.
+function countCodePoints(text: string) {
   // eslint-disable-next-line @typescript-eslint/no-misused-spread -- the spec counts code points
-  const length = [...title].length
+  return [...text].length
+}
+
+/** The length the 200 limit applies to, for showing a counter. */
+export function titleLength(raw: string) {
+  return countCodePoints(normaliseTitle(raw))
+}
+
+export function validateTitle(raw: string): TitleResult {
+  const title = normaliseTitle(raw)
+  const length = countCodePoints(title)
 
   if (length === 0) return { ok: false, error: "empty" }
   if (length > TASK_MAX_TITLE_LENGTH) {
