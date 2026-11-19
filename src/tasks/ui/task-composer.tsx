@@ -15,6 +15,7 @@ import {
   validateTitle,
 } from "../model"
 import type { AddResult } from "../store"
+import { highlightTask } from "./highlight"
 import { titleErrorMessage } from "./title-messages"
 
 const styles = stylex.create({
@@ -23,7 +24,7 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomWidth: "1px",
   },
-  // Centers the plus icon on the input, which sits below the field label.
+  // Centers the plus icon on the field's first line.
   marker: {
     alignItems: "center",
     display: "flex",
@@ -32,9 +33,9 @@ const styles = stylex.create({
   },
   form: {
     gap: spacing.space2,
-    alignItems: "end",
+    alignItems: "flex-start",
     display: "flex",
-    paddingBottom: spacing.space8,
+    paddingBottom: spacing.space3,
     paddingTop: spacing.space3,
   },
   // Lines the button up with the field, which sits below the field label.
@@ -75,6 +76,7 @@ export function TaskComposer({ onAdd }: TaskComposerProps) {
     const result = onAdd(title)
     if (result.ok) {
       setTitle("")
+      highlightTask(result.task.id)
       announce(`Task added: ${result.task.title}`)
     } else {
       setTriedEmpty(true)

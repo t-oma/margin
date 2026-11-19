@@ -2,9 +2,16 @@ import * as stylex from "@stylexjs/stylex"
 
 import { Checkbox } from "@/components/checkbox"
 import { sheetLayout } from "@/components/sheet"
-import { colors, spacing } from "@/tokens.stylex"
+import { colors, media, motion, spacing } from "@/tokens.stylex"
 
 import type { Task } from "../model"
+import { clearHighlight, useIsHighlighted } from "./highlight"
+
+// A new or changed row is tinted, then fades back to the page colour.
+const fadeOut = stylex.keyframes({
+  from: { backgroundColor: colors.accentTint },
+  to: { backgroundColor: "transparent" },
+})
 
 const styles = stylex.create({
   root: {},
@@ -15,6 +22,19 @@ const styles = stylex.create({
       ":first-child": "none",
     },
     borderTopWidth: "1px",
+  },
+  // The tint holds for 1.6 s, then fades over 600 ms.
+  highlighted: {
+    animationDelay: motion.delayHighlight,
+    animationDuration: motion.durationHighlight,
+    // Shows the tint during the delay as well.
+    animationFillMode: "backwards",
+    animationName: fadeOut,
+    // With reduced motion the tint stays to the end and goes without a fade.
+    animationTimingFunction: {
+      default: motion.easing,
+      [media.reducedMotion]: "step-end",
+    },
   },
   taskMarker: {
     paddingTop: "2px",
@@ -40,26 +60,54 @@ export function TaskList({ tasks, onToggle }: TaskListProps) {
   return (
     <ul role="list" {...stylex.props(styles.root)}>
       {tasks.map((task) => (
-        <li key={task.id} {...stylex.props(sheetLayout.row, styles.task)}>
-          <div {...stylex.props(sheetLayout.margin, styles.taskMarker)}>
-            <Checkbox
-              checked={task.done}
-              onChange={() => onToggle(task.id)}
-              aria-label={`${task.done ? "Mark as not done" : "Mark as done"}: ${task.title}`}
-            />
-          </div>
-
-          <div
-            {...stylex.props(
-              sheetLayout.body,
-              styles.taskTitle,
-              task.done && styles.taskDone
-            )}
-          >
-            {task.title}
-          </div>
-        </li>
+        <TaskRow key={task.id} task={task} onToggle={onToggle} />
       ))}
     </ul>
+  )
+}
+
+type TaskRowProps = {
+  task: Task
+  onToggle: (id: string) => void
+}
+
+function TaskRow({ task, onToggle }: TaskRowProps) {
+  const highlighted = useIsHighlighted(task.id)
+
+  return (
+    <li
+      // The highlight plays once. Clearing it when it ends stops it from
+      // playing again if the row is rendered anew.
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget) clearHighlight(task.id)
+      }}
+      {...stylex.props(
+        sheetLayout.row,
+        styles.task,
+        highlighted && styles.highlighted
+      )}
+    >
+      <div {...stylex.props(sheetLayout.margin, styles.taskMarker)}>
+        <Checkbox
+          checked={task.done}
+          onChange={() => {
+            // The task moves to the other list and must not flash there.
+            clearHighlight(task.id)
+            onToggle(task.id)
+          }}
+          aria-label={`${task.done ? "Mark as not done" : "Mark as done"}: ${task.title}`}
+        />
+      </div>
+
+      <div
+        {...stylex.props(
+          sheetLayout.body,
+          styles.taskTitle,
+          task.done && styles.taskDone
+        )}
+      >
+        {task.title}
+      </div>
+    </li>
   )
 }
