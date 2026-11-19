@@ -104,13 +104,14 @@ describe("changes", () => {
   test("adds a task with a normalised title and saves it", () => {
     const { store, saved } = setup()
 
-    expect(store.add("  Pay the bill ")).toEqual({
-      ok: true,
-      title: "Pay the bill",
-    })
-    expect(store.getSnapshot().tasks).toEqual([
-      createTask("task-1", "Pay the bill", "2026-11-14T10:00:00.000Z"),
-    ])
+    const task = createTask(
+      "task-1",
+      "Pay the bill",
+      "2026-11-14T10:00:00.000Z"
+    )
+
+    expect(store.add("  Pay the bill ")).toEqual({ ok: true, task })
+    expect(store.getSnapshot().tasks).toEqual([task])
     expect(saved()).toEqual({
       ok: true,
       state: {

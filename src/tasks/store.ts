@@ -1,9 +1,11 @@
 import {
   completeTask,
   createTask,
+  type OpenTask,
   renameTask,
   reopenTask,
   type Task,
+  type TitleError,
   type TitleResult,
   validateTitle,
 } from "./model"
@@ -25,10 +27,12 @@ export type TaskStoreSnapshot = {
   loadError: "unreadable" | null
 }
 
+export type AddResult = { ok: true; task: OpenTask } | TitleError
+
 export type TaskStore = {
   getSnapshot: () => TaskStoreSnapshot
   subscribe: (listener: () => void) => () => void
-  add: (rawTitle: string) => TitleResult
+  add: (rawTitle: string) => AddResult
   rename: (
     id: string,
     rawTitle: string
@@ -104,9 +108,11 @@ export function createTaskStore({
   }
 
   // Every change goes through here: new state, save, tell the subscribers.
-  function commit(tasks: Task[], doneCollapsed: boolean) {
-    const saveStatus = save(tasks, doneCollapsed)
-    snapshot = { ...snapshot, tasks, doneCollapsed, saveStatus }
+  function commit(
+    changes: Partial<Pick<TaskStoreSnapshot, "tasks" | "doneCollapsed">>
+  ) {
+    const next = { ...snapshot, ...changes }
+    snapshot = { ...next, saveStatus: save(next.tasks, next.doneCollapsed) }
     notify()
   }
 
@@ -114,7 +120,7 @@ export function createTaskStore({
     const tasks = snapshot.tasks.map((task) =>
       task.id === id ? update(task) : task
     )
-    commit(tasks, snapshot.doneCollapsed)
+    commit({ tasks })
   }
 
   const stopListeningToOtherTabs = onOtherTabChange?.((raw) => {
@@ -142,11 +148,11 @@ export function createTaskStore({
 
     add(rawTitle) {
       const result = validateTitle(rawTitle)
-      if (result.ok) {
-        const task = createTask(newId(), result.title, now())
-        commit([task, ...snapshot.tasks], snapshot.doneCollapsed)
-      }
-      return result
+      if (!result.ok) return result
+
+      const task = createTask(newId(), result.title, now())
+      commit({ tasks: [task, ...snapshot.tasks] })
+      return { ok: true, task }
     },
 
     rename(id, rawTitle) {
@@ -169,12 +175,11 @@ export function createTaskStore({
     },
 
     remove(id) {
-      const tasks = snapshot.tasks.filter((task) => task.id !== id)
-      commit(tasks, snapshot.doneCollapsed)
+      commit({ tasks: snapshot.tasks.filter((task) => task.id !== id) })
     },
 
     setDoneCollapsed(collapsed) {
-      commit(snapshot.tasks, collapsed)
+      commit({ doneCollapsed: collapsed })
     },
 
     retrySave() {
