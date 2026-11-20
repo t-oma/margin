@@ -88,3 +88,9 @@ export function doneTasks(tasks: Task[]): DoneTask[] {
     .filter((task): task is DoneTask => task.done)
     .sort((a, b) => newestFirst(a.completedAt, b.completedAt))
 }
+
+export function neighborTask(tasks: Task[], id: string): Task | null {
+  const index = tasks.findIndex((task) => task.id === id)
+  if (index === -1) return null
+  return tasks[index + 1] ?? tasks[index - 1] ?? null
+}

@@ -4,6 +4,7 @@ import {
   completeTask,
   createTask,
   doneTasks,
+  neighborTask,
   renameTask,
   reopenTask,
   TASK_MAX_TITLE_LENGTH,
@@ -141,4 +142,44 @@ test("each list holds only its own tasks", () => {
 
   expect(ids(todoTasks([open, done]))).toEqual(["open"])
   expect(ids(doneTasks([open, done]))).toEqual(["done"])
+})
+
+describe("neighborTask", () => {
+  it("returns null for empty tasks array", () => {
+    expect(neighborTask([], "a")).toBeNull()
+  })
+
+  it("returns null for task id that is not in the array", () => {
+    const tasks = [
+      createTask("a", "title 1", at(0)),
+      createTask("b", "title 2", at(1)),
+    ]
+
+    expect(neighborTask(tasks, "abcd")).toBeNull()
+  })
+
+  it("returns next task if it exists", () => {
+    const tasks = [
+      createTask("a", "title 1", at(0)),
+      createTask("b", "title 2", at(1)),
+      createTask("c", "title 3", at(2)),
+    ]
+
+    expect(neighborTask(tasks, "b")).toEqual(tasks[2])
+  })
+
+  it("returns previous task if it exists but next doesn't", () => {
+    const tasks = [
+      createTask("a", "title 1", at(0)),
+      createTask("b", "title 2", at(1)),
+    ]
+
+    expect(neighborTask(tasks, "b")).toEqual(tasks[0])
+  })
+
+  it("returns null when the task is the only one", () => {
+    const tasks = [createTask("a", "title 1", at(0))]
+
+    expect(neighborTask(tasks, "a")).toBeNull()
+  })
 })
