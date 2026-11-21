@@ -2,7 +2,9 @@ import * as stylex from "@stylexjs/stylex"
 import { type RefCallback, useRef } from "react"
 
 import { Checkbox } from "@/components/checkbox"
+import { announce } from "@/components/live-region"
 import { sheetLayout } from "@/components/sheet"
+import { VisuallyHidden } from "@/components/visually-hidden"
 import { colors, media, motion, spacing } from "@/tokens.stylex"
 
 import { neighborTask, type Task } from "../model"
@@ -123,6 +125,11 @@ function TaskRow({ task, onToggle, checkboxRef }: TaskRowProps) {
           onChange={() => {
             // The task moves to the other list and must not flash there.
             clearHighlight(task.id)
+            announce(
+              task.done
+                ? `${task.title} moved back to To do`
+                : `Marked as done: ${task.title}`
+            )
             onToggle(task.id)
           }}
           aria-label={`${task.done ? "Mark as not done" : "Mark as done"}: ${task.title}`}
@@ -136,6 +143,7 @@ function TaskRow({ task, onToggle, checkboxRef }: TaskRowProps) {
           task.done && styles.taskDone
         )}
       >
+        {task.done && <VisuallyHidden>Done: </VisuallyHidden>}
         {task.title}
       </div>
     </li>

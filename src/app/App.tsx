@@ -3,7 +3,7 @@ import { CheckIcon, DotIcon } from "lucide-react"
 import { useRef } from "react"
 
 import { Header } from "@/components/header"
-import { LiveRegion } from "@/components/live-region"
+import { announce, LiveRegion } from "@/components/live-region"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
 import {
   TaskComposer,
@@ -49,6 +49,11 @@ function App() {
   const doneSectionToggleRef = useRef<HTMLButtonElement>(null)
   const { tasks, todo, done, doneCollapsed, add, setDoneCollapsed, toggle } =
     useTasks()
+
+  function handleDoneCollapse(collapsed: boolean) {
+    setDoneCollapsed(collapsed)
+    announce(collapsed ? "Done tasks hidden" : "Done tasks shown")
+  }
 
   return (
     <div {...stylex.props(styles.root)}>
@@ -101,7 +106,7 @@ function App() {
                 title="Done"
                 badge={<TaskCount count={done.length} />}
                 collapsed={doneCollapsed}
-                onCollapsedChange={setDoneCollapsed}
+                onCollapsedChange={handleDoneCollapse}
               >
                 {done.length > 0 ? (
                   <TaskList
