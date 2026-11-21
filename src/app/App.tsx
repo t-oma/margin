@@ -1,10 +1,17 @@
 import * as stylex from "@stylexjs/stylex"
 import { CheckIcon, DotIcon } from "lucide-react"
+import { useRef } from "react"
 
 import { Header } from "@/components/header"
 import { LiveRegion } from "@/components/live-region"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
-import { TaskComposer, TaskCount, TaskList, useTasks } from "@/tasks"
+import {
+  TaskComposer,
+  type TaskComposerHandle,
+  TaskCount,
+  TaskList,
+  useTasks,
+} from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
 
 const styles = stylex.create({
@@ -38,6 +45,8 @@ const styles = stylex.create({
 })
 
 function App() {
+  const composerRef = useRef<TaskComposerHandle>(null)
+  const doneSectionToggleRef = useRef<HTMLButtonElement>(null)
   const { tasks, todo, done, doneCollapsed, add, setDoneCollapsed, toggle } =
     useTasks()
 
@@ -58,7 +67,7 @@ function App() {
         </p>
 
         <Sheet>
-          <TaskComposer onAdd={add} />
+          <TaskComposer ref={composerRef} onAdd={add} />
 
           {tasks.length === 0 ? (
             <SheetEmpty
@@ -73,7 +82,11 @@ function App() {
                 badge={<TaskCount count={todo.length} />}
               >
                 {todo.length > 0 ? (
-                  <TaskList tasks={todo} onToggle={toggle} />
+                  <TaskList
+                    tasks={todo}
+                    onToggle={toggle}
+                    focusFallback={() => composerRef.current?.focus()}
+                  />
                 ) : (
                   <SheetEmpty
                     marker={<CheckIcon size={20} aria-hidden="true" />}
@@ -84,13 +97,18 @@ function App() {
               </SheetSection>
 
               <SheetSection
+                toggleRef={doneSectionToggleRef}
                 title="Done"
                 badge={<TaskCount count={done.length} />}
                 collapsed={doneCollapsed}
                 onCollapsedChange={setDoneCollapsed}
               >
                 {done.length > 0 ? (
-                  <TaskList tasks={done} onToggle={toggle} />
+                  <TaskList
+                    tasks={done}
+                    onToggle={toggle}
+                    focusFallback={() => doneSectionToggleRef.current?.focus()}
+                  />
                 ) : (
                   <SheetEmpty
                     title="Nothing finished yet"

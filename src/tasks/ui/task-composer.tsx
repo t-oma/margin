@@ -1,6 +1,12 @@
 import * as stylex from "@stylexjs/stylex"
 import { PlusIcon } from "lucide-react"
-import { type SubmitEvent, useRef, useState } from "react"
+import {
+  type Ref,
+  type SubmitEvent,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 
 import { Button } from "@/components/button"
 import { TextField } from "@/components/field"
@@ -49,13 +55,26 @@ const EMPTY: TitleError = { ok: false, error: "empty" }
 // The counter shows from this length up, before the limit is reached.
 const COUNTER_FROM = 180
 
-type TaskComposerProps = { onAdd: (title: string) => AddResult }
+export type TaskComposerHandle = { focus: () => void }
 
-export function TaskComposer({ onAdd }: TaskComposerProps) {
+type TaskComposerProps = {
+  ref?: Ref<TaskComposerHandle>
+  onAdd: (title: string) => AddResult
+}
+
+export function TaskComposer({ ref, onAdd }: TaskComposerProps) {
   const [title, setTitle] = useState("")
   // An empty field is normal, so "empty" shows only after a submit.
   const [triedEmpty, setTriedEmpty] = useState(false)
   const fieldRef = useRef<HTMLTextAreaElement>(null)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => fieldRef.current?.focus(),
+    }),
+    []
+  )
 
   // "long" follows the text while it is typed.
   const live = validateTitle(title)

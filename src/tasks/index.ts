@@ -1,5 +1,5 @@
 export type { DoneTask, OpenTask, Task } from "./model.ts"
-export { TaskComposer } from "./ui/task-composer.tsx"
+export { TaskComposer, type TaskComposerHandle } from "./ui/task-composer.tsx"
 export { TaskCount } from "./ui/task-count.tsx"
 export { TaskList } from "./ui/task-list.tsx"
 export { useTasks } from "./use-tasks.ts"

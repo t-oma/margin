@@ -1,10 +1,11 @@
 import * as stylex from "@stylexjs/stylex"
+import { type RefCallback, useRef } from "react"
 
 import { Checkbox } from "@/components/checkbox"
 import { sheetLayout } from "@/components/sheet"
 import { colors, media, motion, spacing } from "@/tokens.stylex"
 
-import type { Task } from "../model"
+import { neighborTask, type Task } from "../model"
 import { clearHighlight, useIsHighlighted } from "./highlight"
 
 // A new or changed row is tinted, then fades back to the page colour.
@@ -54,13 +55,40 @@ const styles = stylex.create({
 type TaskListProps = {
   tasks: Task[]
   onToggle: (id: string) => void
+  focusFallback: () => void
 }
 
-export function TaskList({ tasks, onToggle }: TaskListProps) {
+export function TaskList({ tasks, onToggle, focusFallback }: TaskListProps) {
+  const checkboxes = useRef(new Map<string, HTMLInputElement>())
+
+  function checkboxRef(id: string): RefCallback<HTMLInputElement> {
+    return (element) => {
+      if (!element) return
+      checkboxes.current.set(id, element)
+
+      return () => {
+        checkboxes.current.delete(id)
+      }
+    }
+  }
+
+  function handleToggle(id: string) {
+    const neighbor = neighborTask(tasks, id)
+    const checkbox = neighbor ? checkboxes.current.get(neighbor.id) : undefined
+    if (checkbox) checkbox.focus()
+    else focusFallback()
+    onToggle(id)
+  }
+
   return (
     <ul role="list" {...stylex.props(styles.root)}>
       {tasks.map((task) => (
-        <TaskRow key={task.id} task={task} onToggle={onToggle} />
+        <TaskRow
+          key={task.id}
+          task={task}
+          onToggle={handleToggle}
+          checkboxRef={checkboxRef(task.id)}
+        />
       ))}
     </ul>
   )
@@ -69,9 +97,10 @@ export function TaskList({ tasks, onToggle }: TaskListProps) {
 type TaskRowProps = {
   task: Task
   onToggle: (id: string) => void
+  checkboxRef: RefCallback<HTMLInputElement>
 }
 
-function TaskRow({ task, onToggle }: TaskRowProps) {
+function TaskRow({ task, onToggle, checkboxRef }: TaskRowProps) {
   const highlighted = useIsHighlighted(task.id)
 
   return (
@@ -89,6 +118,7 @@ function TaskRow({ task, onToggle }: TaskRowProps) {
     >
       <div {...stylex.props(sheetLayout.margin, styles.taskMarker)}>
         <Checkbox
+          ref={checkboxRef}
           checked={task.done}
           onChange={() => {
             // The task moves to the other list and must not flash there.

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type ReactNode, useId } from "react"
+import { type ReactNode, type Ref, useId } from "react"
 
 import { colors, spacing, typography } from "@/tokens.stylex"
 
@@ -42,6 +42,7 @@ const styles = stylex.create({
 })
 
 type SheetSectionProps = {
+  toggleRef?: Ref<HTMLButtonElement>
   title: ReactNode
   /** Rendered next to the title, e.g. a count badge. */
   badge?: ReactNode
@@ -58,6 +59,7 @@ type SheetSectionProps = {
 }
 
 export function SheetSection({
+  toggleRef,
   title,
   badge,
   collapsed = false,
@@ -89,6 +91,7 @@ export function SheetSection({
             <div {...stylex.props(styles.toggle)}>
               {/* Named by its own text and the heading: "Hide Done". */}
               <SheetSectionToggle
+                ref={toggleRef}
                 id={toggleId}
                 expanded={!collapsed}
                 aria-controls={contentId}
