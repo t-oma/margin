@@ -1,15 +1,22 @@
 import * as stylex from "@stylexjs/stylex"
 import { CheckIcon, DotIcon } from "lucide-react"
-import { useRef } from "react"
+import { useRef, useState } from "react"
+import { flushSync } from "react-dom"
 
 import { Header } from "@/components/header"
 import { announce, LiveRegion } from "@/components/live-region"
 import { Sheet, SheetEmpty, SheetSection } from "@/components/sheet"
 import {
+  type DoneTask,
+  doneToast,
+  highlightTask,
   TaskComposer,
   type TaskComposerHandle,
   TaskCount,
   TaskList,
+  type TaskListHandle,
+  TaskToast,
+  type TaskToastState,
   useTasks,
 } from "@/tasks"
 import { colors, sizes, spacing, typography } from "@/tokens.stylex"
@@ -46,13 +53,42 @@ const styles = stylex.create({
 
 function App() {
   const composerRef = useRef<TaskComposerHandle>(null)
+  const todoListRef = useRef<TaskListHandle>(null)
   const doneSectionToggleRef = useRef<HTMLButtonElement>(null)
   const { tasks, todo, done, doneCollapsed, add, setDoneCollapsed, toggle } =
     useTasks()
 
+  const [toast, setToast] = useState<TaskToastState | null>(null)
+
+  const dismissToast = (id: number) =>
+    setToast((current) => (current?.id === id ? null : current))
+
+  const dismissToastFor = (taskId: string) =>
+    setToast((current) => (current?.taskId === taskId ? null : current))
+
   function handleDoneCollapse(collapsed: boolean) {
     setDoneCollapsed(collapsed)
     announce(collapsed ? "Done tasks hidden" : "Done tasks shown")
+  }
+
+  function handleUndo(task: DoneTask) {
+    flushSync(() => {
+      toggle(task.id)
+      highlightTask(task.id)
+    })
+    todoListRef.current?.focusCheckbox(task.id)
+    announce(`Undone. ${task.title} is back in To do`)
+    setToast(null)
+  }
+
+  function handleComplete(id: string) {
+    toggle(id)
+    setToast(doneToast(id))
+  }
+
+  function handleReopen(id: string) {
+    toggle(id)
+    dismissToastFor(id)
   }
 
   return (
@@ -88,8 +124,9 @@ function App() {
               >
                 {todo.length > 0 ? (
                   <TaskList
+                    ref={todoListRef}
                     tasks={todo}
-                    onToggle={toggle}
+                    onToggle={handleComplete}
                     focusFallback={() => composerRef.current?.focus()}
                   />
                 ) : (
@@ -111,7 +148,7 @@ function App() {
                 {done.length > 0 ? (
                   <TaskList
                     tasks={done}
-                    onToggle={toggle}
+                    onToggle={handleReopen}
                     focusFallback={() => doneSectionToggleRef.current?.focus()}
                   />
                 ) : (
@@ -124,6 +161,16 @@ function App() {
             </>
           )}
         </Sheet>
+
+        {toast && (
+          <TaskToast
+            key={toast.id}
+            toast={toast}
+            tasks={tasks}
+            onUndo={handleUndo}
+            onDismiss={dismissToast}
+          />
+        )}
       </main>
 
       <LiveRegion />
