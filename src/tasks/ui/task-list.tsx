@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import { type RefCallback, useRef } from "react"
+import { type Ref, type RefCallback, useImperativeHandle, useRef } from "react"
 
 import { Checkbox } from "@/components/checkbox"
 import { announce } from "@/components/live-region"
@@ -54,14 +54,34 @@ const styles = stylex.create({
   },
 })
 
+export type TaskListHandle = {
+  focusCheckbox: (id: string) => void
+}
+
 type TaskListProps = {
+  ref?: Ref<TaskListHandle>
   tasks: Task[]
   onToggle: (id: string) => void
   focusFallback: () => void
 }
 
-export function TaskList({ tasks, onToggle, focusFallback }: TaskListProps) {
+export function TaskList({
+  ref,
+  tasks,
+  onToggle,
+  focusFallback,
+}: TaskListProps) {
   const checkboxes = useRef(new Map<string, HTMLInputElement>())
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focusCheckbox: (id) => {
+        checkboxes.current.get(id)?.focus()
+      },
+    }),
+    []
+  )
 
   function checkboxRef(id: string): RefCallback<HTMLInputElement> {
     return (element) => {
