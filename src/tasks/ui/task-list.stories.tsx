@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { createRef } from "react"
 import { expect, fireEvent, fn, waitFor } from "storybook/test"
 
 import { announce, LiveRegion } from "@/components/live-region"
@@ -6,7 +7,7 @@ import { Sheet } from "@/components/sheet"
 
 import { completeTask, createTask } from "../model"
 import { clearHighlight, highlighter, highlightTask } from "./highlight"
-import { TaskList } from "./task-list"
+import { TaskList, type TaskListHandle } from "./task-list"
 
 const CREATED = "2026-11-17T10:00:00.000Z"
 
@@ -257,5 +258,34 @@ export const UntickAnnounces: Story = {
         canvas.getByText("Pay the electricity bill moved back to To do")
       ).toBeInTheDocument()
     )
+  },
+}
+
+const listHandle = createRef<TaskListHandle>()
+
+export const FocusCheckbox: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`focusCheckbox(id)` on the list's ref moves focus to that row's checkbox. The app calls it after Undo, so focus lands on the task that came back. An id that is not in the list leaves focus where it was.",
+      },
+    },
+  },
+  render: (args) => <TaskList {...args} ref={listHandle} />,
+  play: async ({ canvas, step }) => {
+    const tickets = canvas.getByRole("checkbox", {
+      name: "Mark as done: Book train tickets to Lviv",
+    })
+
+    await step("a row in the list gets focus", async () => {
+      listHandle.current?.focusCheckbox("tickets")
+      await expect(tickets).toHaveFocus()
+    })
+
+    await step("an id that is not in the list changes nothing", async () => {
+      listHandle.current?.focusCheckbox("missing")
+      await expect(tickets).toHaveFocus()
+    })
   },
 }
