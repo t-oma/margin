@@ -1,3 +1,5 @@
+export type PausableTimeout = ReturnType<typeof createPausableTimeout>
+
 export function createPausableTimeout(callback: () => void, ms: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined
   let startTime: number

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex"
-import type { ReactNode } from "react"
+import { type ReactNode, useEffect, useEffectEvent, useRef } from "react"
 
 import { focusRing } from "@/styles/focus"
 import {
@@ -12,6 +12,8 @@ import {
   typography,
   zIndices,
 } from "@/tokens.stylex"
+
+import { createPausableTimeout, type PausableTimeout } from "./timeout"
 
 const styles = stylex.create({
   root: {
@@ -79,12 +81,58 @@ type ToastProps = {
   onAction: () => void
   actionLabel: string
   icon: ReactNode
+  duration?: number
+  onTimeout: () => void
   children: ReactNode
 }
 
-export function Toast({ onAction, actionLabel, icon, children }: ToastProps) {
+export function Toast({
+  onAction,
+  actionLabel,
+  icon,
+  duration = 6000,
+  onTimeout,
+  children,
+}: ToastProps) {
+  const timeoutRef = useRef<PausableTimeout | null>(null)
+  const hoveredRef = useRef(false)
+  const focusedRef = useRef(false)
+
+  const handleTimeout = useEffectEvent(() => onTimeout())
+
+  useEffect(() => {
+    const timeout = createPausableTimeout(handleTimeout, duration)
+    timeoutRef.current = timeout
+
+    return () => {
+      timeout.cancel()
+      timeoutRef.current = null
+    }
+  }, [duration])
+
   return (
-    <div {...stylex.props(styles.root)}>
+    <div
+      {...stylex.props(styles.root)}
+      onPointerEnter={() => {
+        hoveredRef.current = true
+        timeoutRef.current?.pause()
+      }}
+      onPointerLeave={() => {
+        hoveredRef.current = false
+        if (!focusedRef.current) timeoutRef.current?.resume()
+      }}
+      onFocus={() => {
+        focusedRef.current = true
+
+        timeoutRef.current?.pause()
+      }}
+      onBlur={(e) => {
+        if (e.currentTarget.contains(e.relatedTarget)) return
+
+        focusedRef.current = false
+        if (!hoveredRef.current) timeoutRef.current?.resume()
+      }}
+    >
       {icon}
       <span {...stylex.props(styles.message)}>{children}</span>
       <button
